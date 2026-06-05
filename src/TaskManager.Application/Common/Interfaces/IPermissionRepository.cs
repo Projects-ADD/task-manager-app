@@ -1,17 +1,17 @@
 using TaskManager.Domain.Entities;
-
+using TaskAsync = System.Threading.Tasks.Task;
 namespace TaskManager.Application.Common.Interfaces;
 
 public interface IPermissionRepository
 {
-    Task AddAsync(Permission permission);
+    TaskAsync AddAsync(Permission permission);
 
-    Task<List<Permission>> GetAllAsync();
+    System.Threading.Tasks.Task<List<Permission>> GetAllAsync();
 
-    Task<Permission?> GetByIdAsync(Guid id);
+    System.Threading.Tasks.Task<Permission?> GetByIdAsync(Guid id);
 
-    Task UpdateAsync(Permission permission);
+    TaskAsync UpdateAsync(Permission permission);
 
-    Task SaveChangesAsync();
+    TaskAsync SaveChangesAsync();
 }
 
