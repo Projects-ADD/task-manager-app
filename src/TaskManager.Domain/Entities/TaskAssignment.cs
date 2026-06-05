@@ -1,3 +1,8 @@
+using TaskManager.Domain.Common;
+using TaskManager.Domain.Enums;
+
+namespace TaskManager.Domain.Entities;
+
 public class TaskAssignment : BaseEntity
 {
     public Guid TaskId { get; private set; }

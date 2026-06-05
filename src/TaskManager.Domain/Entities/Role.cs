@@ -1,3 +1,7 @@
+using TaskManager.Domain.Common;
+
+namespace TaskManager.Domain.Entities;
+
 public class Role : AggregateRoot
 {
     public string Name { get; private set; }

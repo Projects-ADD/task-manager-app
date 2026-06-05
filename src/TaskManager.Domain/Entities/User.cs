@@ -1,3 +1,7 @@
+using TaskManager.Domain.Common;
+
+namespace TaskManager.Domain.Entities;
+
 public class User : AggregateRoot
 {
     public string Email { get; private set; }
