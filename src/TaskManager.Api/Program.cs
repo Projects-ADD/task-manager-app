@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Application.Common.Interfaces;
+using TaskManager.Application.Features.Permissions;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Repositories;
 
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<TaskManagerDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 var app = builder.Build();
 

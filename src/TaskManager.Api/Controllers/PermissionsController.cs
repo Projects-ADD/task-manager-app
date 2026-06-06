@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using TaskManager.Application.Common.Interfaces;
+using TaskManager.Application.Features.Permissions;
+using TaskManager.Application.Features.Permissions.DTOs;
 using TaskManager.Contracts.Requests;
 using TaskManager.Contracts.Responses;
-using TaskManager.Domain.Entities;
 
 namespace TaskManager.Api.Controllers;
 
@@ -10,49 +10,69 @@ namespace TaskManager.Api.Controllers;
 [Route("api/permissions")]
 public class PermissionsController : ControllerBase
 {
-    private readonly IPermissionRepository _permissionRepository;
+    private readonly IPermissionService _permissionService;
 
-    public PermissionsController(IPermissionRepository permissionRepository)
+    public PermissionsController(IPermissionService permissionService)
     {
-        _permissionRepository = permissionRepository;
+        _permissionService = permissionService;
     }
 
     [HttpPost]
     public async Task<ActionResult<PermissionResponse>> Create([FromBody] CreatePermissionRequest request)
     {
-        var permission = new Permission(request.Name, request.Description);
+        var permission = await _permissionService.CreateAsync( request.Name, request.Description);
 
-        await _permissionRepository.AddAsync(permission);
-        await _permissionRepository.SaveChangesAsync();
 
-        var response = MapToResponse(permission);
-
-        return CreatedAtAction( nameof(GetById), new { id = permission.Id }, response);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = permission.Id },
+            new PermissionResponse
+            {
+                Id = permission.Id,
+                Name = permission.Name,
+                Description = permission.Description,
+                CreatedAt = permission.CreatedAt,
+                IsActive = permission.IsActive
+            });
     }
 
     [HttpGet]
     public async Task<ActionResult<List<PermissionResponse>>> GetAll()
     {
-        var permissions = await _permissionRepository.GetAllAsync();
+        var permissions = await _permissionService.GetAllAsync();
 
-        var response = permissions
-            .Select(MapToResponse)
-            .ToList();
+        return Ok(permissions.Select(p => new PermissionResponse
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            CreatedAt = p.CreatedAt,
+            IsActive = p.IsActive
+        }).ToList());
 
-        return Ok(response);
+        //return Ok(permissions.Select(MapToResponse).ToList());
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PermissionResponse>> GetById(Guid id)
     {
-        var permission = await _permissionRepository.GetByIdAsync(id);
+        var permission = await _permissionService.GetByIdAsync(id);
 
         if (permission is null)
         {
             return NotFound();
         }
 
-        return Ok(MapToResponse(permission));
+        return Ok(new PermissionResponse
+        {
+            Id = permission.Id,
+            Name = permission.Name,
+            Description = permission.Description,
+            CreatedAt = permission.CreatedAt,
+            IsActive = permission.IsActive
+        });
+
+        //return Ok(MapToResponse(permission));
     }
 
     [HttpPut("{id:guid}")]
@@ -60,42 +80,20 @@ public class PermissionsController : ControllerBase
         Guid id,
         [FromBody] UpdatePermissionRequest request)
     {
-        var permission = await _permissionRepository.GetByIdAsync(id);
+        var updated = await _permissionService.UpdateAsync( id, request.Name, request.Description);
 
-        if (permission is null)
-        {
-            return NotFound();
-        }
-
-        permission.Update(
-            request.Name,
-            request.Description);
-
-        await _permissionRepository.UpdateAsync(permission);
-        await _permissionRepository.SaveChangesAsync();
-
-        return NoContent();
+        return updated ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var permission = await _permissionRepository.GetByIdAsync(id);
+        var deleted = await _permissionService.DeleteAsync(id);
 
-        if (permission is null)
-        {
-            return NotFound();
-        }
-
-        permission.Delete();
-
-        await _permissionRepository.UpdateAsync(permission);
-        await _permissionRepository.SaveChangesAsync();
-
-        return NoContent();
+        return deleted ? NoContent() : NotFound();
     }
 
-    private static PermissionResponse MapToResponse(Permission permission)
+    private static PermissionResponse MapToResponse(PermissionDto permission)
     {
         return new PermissionResponse
         {
