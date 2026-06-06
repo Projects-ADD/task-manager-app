@@ -20,6 +20,8 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 
 var app = builder.Build();
 
+app.MapControllers();
+
 //app.UseSwagger();
 
 //app.UseSwaggerUI();
