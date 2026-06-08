@@ -1,0 +1,99 @@
+@startuml
+
+entity users {
+  * user_id : UUID <<PK>>
+  email
+  pass_hash
+  created_at
+  is_active
+  deleted_at
+  deleted_by
+}
+
+entity roles {
+  * role_id : UUID <<PK>>
+  name
+  description
+  created_at
+  deleted_at
+  deleted_by
+  is_active
+}
+
+entity permissions {
+  * permission_id : UUID <<PK>>
+  name
+  description
+  created_at
+  deleted_at
+  deleted_by
+  is_active
+}
+
+entity tasks {
+  * task_id : UUID <<PK>>
+  mtitle
+  description
+  status
+  is_active
+  created_at
+  due_at
+  deleted_at
+  deleted_by
+}
+
+entity task_assignment {
+  * _id : UUID <<PK>>
+  * user_id : UUID <<FK>>
+  * task_id : UUID <<FK>>
+  assigned_at
+  assignment_role
+}
+
+entity user_roles {
+  * _id : UUID <<PK>>
+  * user_id : UUID <<FK>>
+  * role_id : UUID <<FK>>
+}
+
+entity role_permissions {
+  * _id : UUID <<PK>>
+  * role_id : UUID <<FK>>
+  * permission_id : UUID <<FK>>
+}
+
+entity user_permissions {
+  * _id : UUID <<PK>>
+  * user_id : UUID <<FK>>
+  * permission_id : UUID <<FK>>
+}
+
+entity audit_logs {
+  * log_id : UUID <<PK>>
+  * user_id : UUID <<FK>>
+  action
+  entity_name
+  entity_id
+  timestamp
+  old_values
+  new_values
+  created_at
+}
+
+users ||--o{ user_roles
+roles ||--o{ user_roles
+
+roles ||--o{ role_permissions
+permissions ||--o{ role_permissions
+
+users ||--o{ user_permissions
+permissions ||--o{ user_permissions
+
+users ||--o{ task_assignment
+tasks ||--o{ task_assignment
+
+users ||--o{ audit_logs
+
+
+
+@enduml
