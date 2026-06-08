@@ -1,50 +1,50 @@
 erDiagram
 
     USERS {
-        bigint user_id PK
+        UUID user_id PK
         string email
         string pass_hash
         datetime created_at
         boolean is_active
-        datetime deleted_at
-        bigint deleted_by
+        datetime deleted_at "nullable"
+        UUID deleted_by
     }
 
     TASKS {
-        bigint task_id PK
+        UUID task_id PK
         string title
         string description
         string status
         boolean is_active
         datetime created_at
         datetime due_at
-        datetime deleted_at
-        bigint deleted_by
+        datetime deleted_at "nullable"
+        UUID deleted_by
     }
 
     ROLES {
-        bigint role_id PK
+        UUID role_id PK
         string name
         string description
         datetime created_at
-        datetime deleted_at
-        bigint deleted_by
+        datetime deleted_at "nullable"
+        UUID deleted_by
         boolean is_active
     }
 
     PERMISSIONS {
-        bigint permission_id PK
+        UUID permission_id PK
         string name
         string description
         datetime created_at
-        datetime deleted_at
-        bigint deleted_by
+        datetime deleted_at "nullable"
+        UUID deleted_by
         boolean is_active
     }
 
     AUDIT_LOGS {
-        bigint log_id PK
-        bigint user_id FK
+        UUID log_id PK
+        UUID user_id FK
         string action
         string entity_name
         bigint entity_id
@@ -52,32 +52,32 @@ erDiagram
         text old_values
         text new_values
         datetime created_at
-        datetime deleted_at
-        bigint deleted_by
+        datetime deleted_at "nullable"
+        UUID deleted_by
     }
 
     USER_ROLES {
-        bigint id PK
-        bigint user_id FK
-        bigint role_id FK
+        UUID id PK
+        UUID user_id FK
+        UUID role_id FK
     }
 
     ROLE_PERMISSIONS {
-        bigint id PK
-        bigint role_id FK
-        bigint permission_id FK
+        UUID id PK
+        UUID role_id FK
+        UUID permission_id FK
     }
 
     USER_PERMISSIONS {
-        bigint id PK
-        bigint user_id FK
-        bigint permission_id FK
+        UUID id PK
+        UUID user_id FK
+        UUID permission_id FK
     }
 
     TASK_ASSIGNMENT {
-        bigint id PK
-        bigint user_id FK
-        bigint task_id FK
+        UUID id PK
+        UUID user_id FK
+        UUID task_id FK
         datetime assigned_at
         string assignment_role
     }
