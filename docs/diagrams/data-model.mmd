@@ -1,94 +1,97 @@
 erDiagram
-    users {
-        UUID user_id PK
+
+    USERS {
+        bigint user_id PK
         string email
         string pass_hash
         datetime created_at
         boolean is_active
         datetime deleted_at
-        UUID deleted_by
+        bigint deleted_by
     }
 
-    roles {
-        UUID role_id PK
-        string name
-        string description
-        datetime created_at
-        datetime deleted_at
-        UUID deleted_by
-        boolean is_active
-    }
-
-    permissions {
-        UUID permission_id PK
-        string name
-        string description
-        datetime created_at
-        datetime deleted_at
-        UUID deleted_by
-        boolean is_active
-    }
-
-    tasks {
-        UUID task_id PK
-        string mtitle
+    TASKS {
+        bigint task_id PK
+        string title
         string description
         string status
         boolean is_active
         datetime created_at
         datetime due_at
         datetime deleted_at
-        UUID deleted_by
+        bigint deleted_by
     }
 
-    task_assignment {
-        UUID _id PK
-        UUID user_id FK
-        UUID task_id FK
+    ROLES {
+        bigint role_id PK
+        string name
+        string description
+        datetime created_at
+        datetime deleted_at
+        bigint deleted_by
+        boolean is_active
+    }
+
+    PERMISSIONS {
+        bigint permission_id PK
+        string name
+        string description
+        datetime created_at
+        datetime deleted_at
+        bigint deleted_by
+        boolean is_active
+    }
+
+    AUDIT_LOGS {
+        bigint log_id PK
+        bigint user_id FK
+        string action
+        string entity_name
+        bigint entity_id
+        datetime timestamp
+        text old_values
+        text new_values
+        datetime created_at
+        datetime deleted_at
+        bigint deleted_by
+    }
+
+    USER_ROLES {
+        bigint id PK
+        bigint user_id FK
+        bigint role_id FK
+    }
+
+    ROLE_PERMISSIONS {
+        bigint id PK
+        bigint role_id FK
+        bigint permission_id FK
+    }
+
+    USER_PERMISSIONS {
+        bigint id PK
+        bigint user_id FK
+        bigint permission_id FK
+    }
+
+    TASK_ASSIGNMENT {
+        bigint id PK
+        bigint user_id FK
+        bigint task_id FK
         datetime assigned_at
         string assignment_role
     }
 
-    user_roles {
-        UUID _id PK
-        UUID user_id FK
-        UUID role_id FK
-    }
+    USERS ||--o{ USER_ROLES : has
+    ROLES ||--o{ USER_ROLES : assigned_to
 
-    role_permissions {
-        UUID _id PK
-        UUID role_id FK
-        UUID permission_id FK
-    }
+    ROLES ||--o{ ROLE_PERMISSIONS : grants
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : included_in
 
-    user_permissions {
-        UUID _id PK
-        UUID user_id FK
-        UUID permission_id FK
-    }
+    USERS ||--o{ USER_PERMISSIONS : receives
+    PERMISSIONS ||--o{ USER_PERMISSIONS : assigned
 
-    audit_logs {
-        UUID log_id PK
-        UUID user_id FK
-        string action
-        string entity_name
-        UUID entity_id
-        datetime timestamp
-        string old_values
-        string new_values
-        datetime created_at
-    }
+    USERS ||--o{ TASK_ASSIGNMENT : participates
+    TASKS ||--o{ TASK_ASSIGNMENT : contains
 
-    users ||--o{ user_roles : has
-    roles ||--o{ user_roles : has
-
-    roles ||--o{ role_permissions : has
-    permissions ||--o{ role_permissions : has
-
-    users ||--o{ user_permissions : has
-    permissions ||--o{ user_permissions : has
-
-    users ||--o{ task_assignment : has
-    tasks ||--o{ task_assignment : has
-
-    users ||--o{ audit_logs : creates
+    USERS ||--o{ AUDIT_LOGS : generates
