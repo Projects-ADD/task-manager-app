@@ -2,10 +2,12 @@ erDiagram
 
     USERS {
         UUID user_id PK
+        string username
         string email
         string pass_hash
         datetime created_at
         boolean is_active
+        datetime last_session "nullable"
         datetime deleted_at "nullable"
         UUID deleted_by "nullable"
     }
