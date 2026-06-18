@@ -1,0 +1,51 @@
+flowchart LR
+
+    subgraph External
+
+        UI[Frontend]
+        Swagger[Swagger]
+        Postgres[(PostgreSQL)]
+
+    end
+
+    subgraph Adapters
+
+        Controller[REST Controllers]
+
+        RepoImpl[Repository Implementations]
+
+    end
+
+    subgraph Application
+
+        UseCases[Use Cases]
+
+        Ports[Repository Interfaces]
+
+    end
+
+    subgraph Domain
+
+        User
+        Task
+        Role
+        Permission
+
+    end
+
+    UI --> Controller
+
+    Swagger --> Controller
+
+    Controller --> UseCases
+
+    UseCases --> Ports
+
+    Ports --> RepoImpl
+
+    RepoImpl --> Postgres
+
+    UseCases --> User
+    UseCases --> Task
+    UseCases --> Role
+    UseCases --> Permission

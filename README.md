@@ -6,30 +6,32 @@ API REST para gestión de tareas, construida con **.NET 8** bajo una arquitectur
 
 ## Arquitectura
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                     TaskManager.Api                      │
-│               (ASP.NET — Controllers, Middleware)         │
-└──────────┬──────────────────────────────────┬────────────┘
-           │                                  │
-┌──────────▼──────────┐         ┌─────────────▼──────────┐
-│  TaskManager.App.   │         │  TaskManager.Infra.    │
-│  Casos de uso,      │         │  EF Core, PostgreSQL,  │
-│  DTOs, validadores  │         │  Repositorios, JWT     │
-└──────────┬──────────┘         └─────────────┬──────────┘
-           │                                  │
-           └──────────┬───────────────────────┘
-                      │
-           ┌──────────▼──────────┐
-           │   TaskManager.Domain │
-           │   Entidades puras,   │
-           │   reglas de negocio  │
-           └─────────────────────┘
+```mermaid
+flowchart LR
 
-           ┌─────────────────────┐
-           │ TaskManager.Contracts│
-           │   DTOs Request/Resp. │
-           └─────────────────────┘
+    Client[Web UI / Mobile UI]
+
+    API[TaskManager.Api]
+
+    APP[Application Layer]
+
+    DOMAIN[Domain Layer]
+
+    INFRA[Infrastructure Layer]
+
+    DB[(PostgreSQL)]
+
+    Client --> API
+
+    API --> APP
+
+    API --> INFRA
+
+    APP --> DOMAIN
+
+    INFRA --> APP
+
+    INFRA --> DB
 ```
 
 ### Proyectos
@@ -100,7 +102,7 @@ Esto levanta PostgreSQL 17 en `localhost:5432`, base de datos `task_manager`, us
 ### 3. Aplicar migraciones (opcional, se aplican automáticamente al iniciar)
 
 ```bash
-dotnet ef database update --project src/TaskManager.Infrastructure
+dotnet ef database update --project src/TaskManager.Infrastructure --startup-project src/TaskManager.Api
 ```
 
 ### 4. Ejecutar la API
@@ -110,7 +112,7 @@ dotnet run --project src/TaskManager.Api
 ```
 
 La API se inicia en:
-- HTTP: `http://localhost:5000`
+- HTTP: `http://localhost:5225`
 - HTTPS: `https://localhost:7000`
 
 ### 5. Verificar
@@ -143,11 +145,13 @@ dotnet publish src/TaskManager.Api/TaskManager.Api.csproj \
 
 # Crear una migración de EF Core
 dotnet ef migrations add <NombreMigracion> \
-    --project src/TaskManager.Infrastructure
+    --project src/TaskManager.Infrastructure \
+    --startup-project src/TaskManager.Api
 
 # Aplicar migraciones a la BD
 dotnet ef database update \
-    --project src/TaskManager.Infrastructure
+    --project src/TaskManager.Infrastructure \
+    --startup-project src/TaskManager.Api
 
 # Iniciar PostgreSQL
 docker compose -f docker/docker-compose.yml up -d
@@ -173,12 +177,26 @@ docker compose -f docker/docker-compose.yml logs -f
 | `PUT` | `/api/permissions/{id:guid}` | Actualizar permiso |
 | `DELETE` | `/api/permissions/{id:guid}` | Eliminación lógica de permiso |
 
-Ejemplo de creación:
-
 ```bash
 curl -X POST http://localhost:5000/api/permissions \
   -H "Content-Type: application/json" \
   -d '{"name": "task:create", "description": "Crear tareas"}'
+```
+
+### Roles (`/api/roles`)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/roles` | Crear un rol |
+| `GET` | `/api/roles` | Listar todos los roles activos |
+| `GET` | `/api/roles/{id:guid}` | Obtener rol por ID |
+| `PUT` | `/api/roles/{id:guid}` | Actualizar rol |
+| `DELETE` | `/api/roles/{id:guid}` | Eliminación lógica de rol |
+
+```bash
+curl -X POST http://localhost:5000/api/roles \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Administrador", "description": "Acceso total al sistema"}'
 ```
 
 ---
@@ -246,7 +264,8 @@ El proyecto se encuentra en fase de construcción activa:
 
 - ✅ Arquitectura fundamental definida y funcional
 - ✅ Flujo CRUD completo para `Permission`
-- 🔄 `User`, `Role`, `Task`, `TaskAssignment` — entidades definidas, lógica de negocio pendiente
+- ✅ Flujo CRUD completo para `Role`
+- 🔄 `User`, `Task`, `TaskAssignment` — entidades definidas, lógica de negocio pendiente
 - ⏳ Eventos de dominio — por conectar
 - ⏳ Tests unitarios, de integración y de arquitectura — por implementar
 - ⏳ Autenticación JWT — por implementar

@@ -1,0 +1,27 @@
+flowchart TB
+
+    TaskManager
+
+    subgraph Users
+        UserEntity
+        UserService
+        UserRepository
+    end
+
+    subgraph Roles
+        RoleEntity
+        RoleService
+        RoleRepository
+    end
+
+    subgraph Permissions
+        PermissionEntity
+        PermissionService
+        PermissionRepository
+    end
+
+    subgraph Tasks
+        TaskEntity
+        TaskService
+        TaskRepository
+    end

@@ -1,0 +1,25 @@
+flowchart LR
+
+    Client[Web UI / Mobile UI]
+    
+    API[TaskManager.Api]
+
+    APP[Application Layer]
+
+    DOMAIN[Domain Layer]
+
+    INFRA[Infrastructure Layer]
+
+    DB[(PostgreSQL)]
+
+    Client --> API
+
+    API --> APP
+
+    API --> INFRA
+
+    APP --> DOMAIN
+
+    INFRA --> APP
+
+    INFRA --> DB
