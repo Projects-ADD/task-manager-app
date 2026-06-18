@@ -12,4 +12,6 @@ public class TaskManagerDbContext : DbContext
     }
 
     public DbSet<Permission> Permissions => Set<Permission>();
+
+    public DbSet<Role> Roles => Set<Role>();
 }

@@ -1,0 +1,16 @@
+using TaskManager.Application.Features.Roles.DTOs;
+
+using TaskManager.Application.Features.Roles;
+
+public interface IRoleService
+{
+    Task<RoleDto> CreateAsync(string name, string description);
+
+    Task<List<RoleDto>> GetAllAsync();
+
+    Task<RoleDto?> GetByIdAsync(Guid id);
+
+    Task<bool> UpdateAsync(Guid id, string name, string description);
+
+    Task<bool> DeleteAsync(Guid id);
+}

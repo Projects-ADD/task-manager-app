@@ -22,7 +22,6 @@ public class PermissionsController : ControllerBase
     {
         var permission = await _permissionService.CreateAsync( request.Name, request.Description);
 
-
         return CreatedAtAction(
             nameof(GetById),
             new { id = permission.Id },
