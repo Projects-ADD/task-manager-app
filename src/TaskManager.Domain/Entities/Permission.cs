@@ -8,7 +8,7 @@ public class Permission : AggregateRoot
 
     public string Description { get; private set; }
 
-    private Permission(){}
+    public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
 
     public Permission(string name, string description)
     {

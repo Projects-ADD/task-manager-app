@@ -8,9 +8,8 @@ public class Role : AggregateRoot
 
     public string Description { get; private set; }
 
-    private readonly List<Permission> _permissions = [];
-
-    private Role(){}
+    public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
+    //private readonly List<Permission> _permissions = [];
 
     public Role(string name, string description)
     {
@@ -32,7 +31,7 @@ public class Role : AggregateRoot
         DeletedAt = DateTime.UtcNow;
     }
 
-    public IReadOnlyCollection<Permission> Permissions => _permissions;
+    //public IReadOnlyCollection<Permission> Permissions => _permissions;
 
     public void AddPermission(Permission permission)
     {
