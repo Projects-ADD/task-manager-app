@@ -15,4 +15,6 @@ public interface IRoleService
     Task<bool> DeleteAsync(Guid id);
 
     Task AssignPermissionAsync(Guid roleId, Guid permissionId);
+
+    Task RevokePermissionAsync(Guid roleId, Guid permissionId);
 }

@@ -50,9 +50,16 @@ public class Role : AggregateRoot
         );
     }
 
-    public void RemovePermission(Permission permission)
+    public void RevokePermission(Guid permissionId)
     {
+        var rolePermission = RolePermissions.FirstOrDefault(rp => rp.PermissionId == permissionId);
 
+        if (rolePermission is null)
+        {
+            throw new InvalidOperationException("Permission is not assigned to the role.");
+        }
+
+        RolePermissions.Remove(rolePermission);
     }
 
 

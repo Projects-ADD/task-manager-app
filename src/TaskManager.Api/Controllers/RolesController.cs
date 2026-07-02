@@ -94,4 +94,12 @@ public class RolesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete("{roleId}/permissions/{permissionId}")]
+    public async Task<IActionResult> RevokePermission(Guid roleId, Guid permissionId)
+    {
+        await _roleService.RevokePermissionAsync(roleId, permissionId);
+
+        return NoContent();
+    }
 }

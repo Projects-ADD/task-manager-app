@@ -105,6 +105,27 @@ public class RoleService : IRoleService
         await _roleRepository.SaveChangesAsync();
     }
 
+    public async System.Threading.Tasks.Task RevokePermissionAsync(Guid roleId, Guid permissionId)
+    {
+        var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
+
+        if (role is null)
+        {
+            throw new Exception("Role not found");
+        }
+
+        var permission = await _permissionRepository.GetByIdAsync(permissionId);
+
+        if (permission is null)
+        {
+            throw new Exception("Permission not found");
+        }
+
+        role.RevokePermission(permissionId);
+
+        await _roleRepository.SaveChangesAsync();
+    }
+
     private static RoleDto MapToDto(Role role)
     {
         return new RoleDto

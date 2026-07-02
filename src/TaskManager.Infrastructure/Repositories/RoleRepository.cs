@@ -12,10 +12,6 @@ public class RoleRepository : IRoleRepository
     public RoleRepository(TaskManagerDbContext db)
     {
         _db = db;
-
-        Console.WriteLine(
-            $"RoleRepository DbContext: {_db.ContextId}"
-        );
     }
 
     public async System.Threading.Tasks.Task AddAsync(Role role)
