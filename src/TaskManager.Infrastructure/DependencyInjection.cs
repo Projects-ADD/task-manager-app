@@ -13,8 +13,17 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        /* services.AddDbContext<TaskManagerDbContext>(options =>
+            options.UseNpgsql(connectionString)); */
+        
         services.AddDbContext<TaskManagerDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        {
+            options.UseNpgsql(connectionString);
+
+            options.EnableSensitiveDataLogging();
+
+            options.LogTo(Console.WriteLine);
+        });
 
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();

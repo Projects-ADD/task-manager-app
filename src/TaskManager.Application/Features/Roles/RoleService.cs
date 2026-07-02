@@ -7,10 +7,12 @@ namespace TaskManager.Application.Features.Roles;
 public class RoleService : IRoleService
 {
     private readonly IRoleRepository _roleRepository;
+    private readonly IPermissionRepository _permissionRepository;
 
-    public RoleService(IRoleRepository roleRepository)
+    public RoleService(IRoleRepository roleRepository, IPermissionRepository permissionRepository)
     {
         _roleRepository = roleRepository;
+        _permissionRepository = permissionRepository;
     }
 
     public async Task<RoleDto> CreateAsync(string name, string description)
@@ -78,6 +80,31 @@ public class RoleService : IRoleService
         return true;
     }
 
+    public async System.Threading.Tasks.Task AssignPermissionAsync(Guid roleId, Guid permissionId)
+    {
+        var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
+
+        if (role is null)
+        {
+            throw new Exception("Role not found");
+        }
+
+        var permission = await _permissionRepository.GetByIdAsync(permissionId);
+
+        if (permission is null)
+        {
+            throw new Exception("Permission not found");
+        }
+
+        role.AssignPermission(permissionId);
+
+        //var rolePermission = new RolePermission( roleId, permissionId );
+
+        //await _roleRepository.AddRolePermissionAsync(rolePermission);
+        //await _roleRepository.UpdateAsync(role);
+        await _roleRepository.SaveChangesAsync();
+    }
+
     private static RoleDto MapToDto(Role role)
     {
         return new RoleDto
@@ -89,4 +116,5 @@ public class RoleService : IRoleService
             IsActive = role.IsActive
         };
     }
+
 }

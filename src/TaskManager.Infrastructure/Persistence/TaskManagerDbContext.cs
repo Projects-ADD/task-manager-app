@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Domain.Entities;
+using TaskManager.Infrastructure.Persistence.Configurations;
 
 namespace TaskManager.Infrastructure.Persistence;
 
@@ -14,4 +15,35 @@ public class TaskManagerDbContext : DbContext
     public DbSet<Permission> Permissions => Set<Permission>();
 
     public DbSet<Role> Roles => Set<Role>();
+
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfiguration(
+            new RoleConfiguration()
+        );
+
+        modelBuilder.ApplyConfiguration(
+            new PermissionConfiguration()
+        );
+
+        modelBuilder.ApplyConfiguration(
+            new RolePermissionConfiguration()
+        );
+    }
+
+    /*
+        //más adelante:
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(
+                typeof(TaskManagerDbContext).Assembly
+            );
+        }
+    */
 }

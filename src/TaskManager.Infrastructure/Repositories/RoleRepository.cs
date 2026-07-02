@@ -12,6 +12,10 @@ public class RoleRepository : IRoleRepository
     public RoleRepository(TaskManagerDbContext db)
     {
         _db = db;
+
+        Console.WriteLine(
+            $"RoleRepository DbContext: {_db.ContextId}"
+        );
     }
 
     public async System.Threading.Tasks.Task AddAsync(Role role)
@@ -44,4 +48,23 @@ public class RoleRepository : IRoleRepository
     {
         await _db.SaveChangesAsync();
     }
+
+    public async System.Threading.Tasks.Task<Role?> GetByIdWithPermissionsAsync(Guid roleId)
+    {
+        /* return await _db.Roles
+            .Include(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(r => r.Id == roleId && r.DeletedAt == null); */
+
+        return await _db.Roles
+            .Include(r => r.RolePermissions)
+            .FirstOrDefaultAsync(
+                r => r.Id == roleId && r.DeletedAt == null
+            );
+    }
+
+    /* public async System.Threading.Tasks.Task AddRolePermissionAsync(RolePermission rolePermission)
+    {
+        await _db.RolePermissions.AddAsync(rolePermission);
+    } */
 }

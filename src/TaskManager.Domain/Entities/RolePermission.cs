@@ -10,4 +10,14 @@ public class RolePermission
     public Role Role { get; private set; } = null!;
     public Permission Permission { get; private set; } = null!;
 
+    private RolePermission()
+    {
+    }
+
+    public RolePermission(Guid roleId, Guid permissionId)
+    {
+        Id = Guid.NewGuid();
+        RoleId = roleId;
+        PermissionId = permissionId;
+    }
 }

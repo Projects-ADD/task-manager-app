@@ -14,6 +14,9 @@ public class PermissionRepository : IPermissionRepository
     public PermissionRepository(TaskManagerDbContext db)
     {
         _db = db;
+        Console.WriteLine(
+            $"PermissionRepository DbContext: {_db.ContextId}"
+        );
     }
 
     public async TaskAsync AddAsync(Permission permission)

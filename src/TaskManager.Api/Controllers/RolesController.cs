@@ -86,4 +86,12 @@ public class RolesController : ControllerBase
 
         return deleted ? NoContent() : NotFound();
     }
+
+    [HttpPost("{roleId}/permissions/{permissionId}")]
+    public async Task<IActionResult> AssignPermission(Guid roleId, Guid permissionId)
+    {
+        await _roleService.AssignPermissionAsync(roleId, permissionId);
+
+        return NoContent();
+    }
 }

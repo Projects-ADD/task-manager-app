@@ -33,9 +33,21 @@ public class Role : AggregateRoot
 
     //public IReadOnlyCollection<Permission> Permissions => _permissions;
 
-    public void AddPermission(Permission permission)
+    public void AssignPermission(Guid permissionId)
     {
-    
+        bool alreadyAssigned = RolePermissions.Any(rp => rp.PermissionId == permissionId);
+
+        if (alreadyAssigned)
+        {
+            throw new InvalidOperationException("Permission is already assigned to the role.");
+        }
+
+        RolePermissions.Add(
+            new RolePermission(
+                Id,
+                permissionId
+            )
+        );
     }
 
     public void RemovePermission(Permission permission)

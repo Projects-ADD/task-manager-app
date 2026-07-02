@@ -10,10 +10,11 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
     {
         builder.ToTable("RolePermissions");
         builder.HasKey(rp => rp.Id);
+        builder.Property(rp => rp.Id).ValueGeneratedNever();
 
         builder.HasIndex(rp => new { rp.RoleId, rp.PermissionId }).IsUnique();
 
-        /* builder
+        builder
             .HasOne(rp => rp.Role)
             .WithMany(r => r.RolePermissions)
             .HasForeignKey(rp => rp.RoleId);
@@ -21,6 +22,6 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
         builder
             .HasOne(rp => rp.Permission)
             .WithMany(p => p.RolePermissions)
-            .HasForeignKey(rp => rp.PermissionId); */
+            .HasForeignKey(rp => rp.PermissionId);
     }
 }
