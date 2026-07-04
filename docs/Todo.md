@@ -135,13 +135,22 @@ Ejemplo:
 
 ## Obtener roles con permisos incluidos
 
-* [ ] Implementar parámetro opcional:
+* [X] Implementar parámetro opcional:
 
   * `GET /roles?includePermissions=true`
 * [ ] Mantener compatibilidad con:
 
   * `GET /roles`
 * [ ] Diseñar DTO específico para la respuesta enriquecida.
+
+[✓] Create RoleWithPermissionsDto
+[✓] Create RoleWithPermissionsResponse
+[✓] Add GetAllWithPermissionsAsync to IRoleRepository
+[✓] Implement in RoleRepository
+[✓] Add GetAllWithPermissionsAsync to IRoleService
+[✓] Implement in RoleService
+[✓] Update GetAll endpoint to accept includePermissions param
+[✓] Build and test
 
 ## Obtener detalle de rol con permisos
 

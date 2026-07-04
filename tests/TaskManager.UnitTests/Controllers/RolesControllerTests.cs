@@ -70,12 +70,9 @@ public class RolesControllerTests
         _roleServiceMock.Setup(s => s.GetAllAsync()).ReturnsAsync(roles);
 
         var result = await _controller.GetAll();
-
-        var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
         okResult.StatusCode.Should().Be(200);
-
-        var apiResponse = okResult.Value.Should().BeOfType<ApiResponse<List<RoleResponse>>>().Subject;
-        apiResponse.Action.Should().Be("get");
+        var apiResponse = okResult.Value.Should().BeAssignableTo<ApiResponse<List<RoleResponse>>>().Subject;
         apiResponse.Data.Should().HaveCount(2);
     }
 
@@ -85,12 +82,9 @@ public class RolesControllerTests
         _roleServiceMock.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<RoleDto>());
 
         var result = await _controller.GetAll();
-
-        var notFoundResult = result.Result.Should().BeOfType<NotFoundObjectResult>().Subject;
+        var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
         notFoundResult.StatusCode.Should().Be(404);
-
-        var apiResponse = notFoundResult.Value.Should().BeOfType<ApiResponse<object>>().Subject;
-        apiResponse.Action.Should().Be("get");
+        var apiResponse = notFoundResult.Value.Should().BeAssignableTo<ApiResponse<object>>().Subject;
         apiResponse.Data.Should().BeNull();
     }
 

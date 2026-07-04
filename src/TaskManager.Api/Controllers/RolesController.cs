@@ -41,9 +41,34 @@ public class RolesController : ControllerBase
 
     }
 
+    //TODO: Test this endpoint with Postman or Swagger.
     [HttpGet]
-    public async Task<ActionResult<List<RoleResponse>>> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] bool includePermissions = false)
     {
+        if (includePermissions)
+        {
+            var rolesWithPermissions = await _roleService.GetAllWithPermissionsAsync();
+
+            if (rolesWithPermissions == null || !rolesWithPermissions.Any())
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Action = "get",
+                    HttpStatusCode = (int)HttpStatusCode.NotFound,
+                    Message = "No roles found.",
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<List<RoleWithPermissionsResponse>>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.OK,
+                Message = "Roles retrieved successfully.",
+                Data = rolesWithPermissions.Select(MapToWithPermissionsResponse).ToList()
+            });
+        }
+
         var roles = await _roleService.GetAllAsync();
 
         if (roles == null || !roles.Any())
@@ -235,6 +260,19 @@ public class RolesController : ControllerBase
             Description = permission.Description,
             CreatedAt = permission.CreatedAt,
             IsActive = permission.IsActive
+        };
+    }
+
+    private static RoleWithPermissionsResponse MapToWithPermissionsResponse(RoleWithPermissionsDto role)
+    {
+        return new RoleWithPermissionsResponse
+        {
+            Id = role.Id,
+            Name = role.Name,
+            Description = role.Description,
+            CreatedAt = role.CreatedAt,
+            IsActive = role.IsActive,
+            Permissions = role.Permissions.Select(MapToPermissionResponse).ToList()
         };
     }
 }

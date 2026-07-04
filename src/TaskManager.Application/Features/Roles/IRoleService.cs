@@ -22,4 +22,6 @@ public interface IRoleService
     Task RevokeManyPermissionsAsync(Guid roleId, List<Guid> permissionIds);
 
     Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId);
+
+    Task<List<RoleWithPermissionsDto>> GetAllWithPermissionsAsync();
 }

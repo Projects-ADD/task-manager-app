@@ -53,6 +53,15 @@ public class RoleRepository : IRoleRepository
             .FirstOrDefaultAsync(r => r.Id == roleId && r.DeletedAt == null);
     }
 
+    public async System.Threading.Tasks.Task<List<Role>> GetAllWithPermissionsAsync()
+    {
+        return await _db.Roles
+            .Where(r => r.DeletedAt == null)
+            .Include(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .ToListAsync();
+    }
+
     /* public async System.Threading.Tasks.Task AddRolePermissionAsync(RolePermission rolePermission)
     {
         await _db.RolePermissions.AddAsync(rolePermission);

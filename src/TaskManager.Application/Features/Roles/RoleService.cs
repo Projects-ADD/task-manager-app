@@ -228,6 +228,30 @@ public class RoleService : IRoleService
             .ToList();
     }
 
+    public async Task<List<RoleWithPermissionsDto>> GetAllWithPermissionsAsync()
+    {
+        var roles = await _roleRepository.GetAllWithPermissionsAsync();
+
+        return roles.Select(r => new RoleWithPermissionsDto
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Description = r.Description,
+            CreatedAt = r.CreatedAt,
+            IsActive = r.IsActive,
+            Permissions = r.RolePermissions
+                .Select(rp => new PermissionDto
+                {
+                    Id = rp.Permission.Id,
+                    Name = rp.Permission.Name,
+                    Description = rp.Permission.Description,
+                    CreatedAt = rp.Permission.CreatedAt,
+                    IsActive = rp.Permission.IsActive
+                })
+                .ToList()
+        }).ToList();
+    }
+
     private static RoleDto MapToDto(Role role)
     {
         return new RoleDto

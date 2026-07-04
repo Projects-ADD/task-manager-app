@@ -16,5 +16,7 @@ public interface IRoleRepository
 
     System.Threading.Tasks.Task<Role?> GetByIdWithPermissionsAsync(Guid roleId);
 
+    System.Threading.Tasks.Task<List<Role>> GetAllWithPermissionsAsync();
+
     //System.Threading.Tasks.Task AddRolePermissionAsync(RolePermission rolePermission);
 }
