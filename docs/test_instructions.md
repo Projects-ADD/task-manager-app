@@ -25,14 +25,14 @@ Esto corre todos los proyectos de test de la solución. Salida esperada:
 
 ```
 Test Run Successful.
-Total tests: 33
-     Passed: 33
+Total tests: 56
+     Passed: 56
 ```
 
 ## 3. Ejecutar solo un proyecto de test
 
 ```bash
-# Unit tests (dominio)
+# Unit tests (dominio y controladores)
 dotnet test tests/TaskManager.UnitTests
 
 # Architecture tests (dependencias entre capas)
@@ -83,11 +83,15 @@ reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coverage-report
 ```
 tests/
 ├── TaskManager.UnitTests/
-│   └── Domain/
-│       ├── BaseEntityTests.cs        # defaults, herencia AggregateRoot
-│       ├── PermissionTests.cs        # CRUD, colecciones, soft delete
-│       ├── RoleTests.cs              # CRUD, AssignPermission, duplicados
-│       └── RolePermissionTests.cs    # creación, ids únicos
+│   ├── Domain/
+│   │   ├── BaseEntityTests.cs        # defaults, herencia AggregateRoot
+│   │   ├── PermissionTests.cs        # CRUD, colecciones, soft delete
+│   │   ├── RoleTests.cs              # CRUD, AssignPermission, duplicados
+│   │   └── RolePermissionTests.cs    # creación, ids únicos
+│   │
+│   └── Controllers/
+│       ├── RolesControllerTests.cs      # CRUD, Assign/Revoke/GetPermissions
+│       └── PermissionsControllerTests.cs # CRUD completo
 │
 └── TaskManager.ArchitectureTests/
     └── Tests/
@@ -98,6 +102,7 @@ tests/
 
 - **xUnit** — framework de tests
 - **FluentAssertions** — aserciones legibles
+- **Moq** — mocking de servicios para tests de controladores
 - **NetArchTest.Rules** — validación de arquitectura hexagonal
 - **coverlet** (opcional) — cobertura de código
 
@@ -106,4 +111,5 @@ tests/
 - Los tests no requieren Base de Datos ni Docker.
 - Los tests de arquitectura analizan los assemblies compilados, no el código fuente.
 - Para agregar un nuevo test de dominio, crear el archivo en `tests/TaskManager.UnitTests/Domain/`.
+- Para agregar un nuevo test de controlador, crear el archivo en `tests/TaskManager.UnitTests/Controllers/`.
 - Para agregar una nueva regla de arquitectura, editar `tests/TaskManager.ArchitectureTests/Tests/DependencyRulesTests.cs`.

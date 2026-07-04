@@ -91,7 +91,7 @@ Funciones complementarias:
 
 ## Asignación masiva de permisos
 
-* [ ] Crear endpoint:
+* [X] Crear endpoint:
 
   * `POST /roles/{roleId}/permissions`
 * [ ] Recibir lista de `permissionIds`.
@@ -112,7 +112,7 @@ Ejemplo:
 
 ## Remoción masiva de permisos
 
-* [ ] Crear endpoint:
+* [x] Crear endpoint:
 
   * `DELETE /roles/{roleId}/permissions`
 * [ ] Recibir lista de permisos a eliminar.

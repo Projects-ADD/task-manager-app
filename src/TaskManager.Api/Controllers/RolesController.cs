@@ -185,6 +185,21 @@ public class RolesController : ControllerBase
         });
     }
 
+    //TODO: Test this endpoint with Postman or Swagger.
+    [HttpDelete("{roleId}/permissions")]
+    public async Task<IActionResult> RevokeManyPermissions(Guid roleId, [FromBody] List<Guid> permissionIds)
+    {
+        await _roleService.RevokeManyPermissionsAsync(roleId, permissionIds);
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "delete",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = $"Permissions revoked from role {roleId} successfully.",
+            Data = null
+        });
+    }
+
     [HttpGet("{roleId}/permissions")]
     public async Task<ActionResult<ApiResponse<List<PermissionResponse>>>> GetPermissionsByRole(Guid roleId)
     {

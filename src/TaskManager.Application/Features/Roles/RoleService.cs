@@ -175,6 +175,38 @@ public class RoleService : IRoleService
         await _roleRepository.SaveChangesAsync();
     }
 
+    public async System.Threading.Tasks.Task RevokeManyPermissionsAsync(Guid roleId, List<Guid> permissionIds)
+    {
+        var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
+
+        if (role is null)
+        {
+            throw new NotFoundException($"Role '{roleId}' was not found.", "role_not_found");
+        }
+
+        // Validate that all permissions exist before revoking any
+        foreach (var permissionId in permissionIds)
+        {
+            var permission = await _permissionRepository.GetByIdAsync(permissionId);
+
+            if (permission is null)
+            {
+                throw new NotFoundException($"Permission '{permissionId}' was not found.", "permission_not_found");
+            }
+
+            try
+            {
+                role.RevokePermission(permissionId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ConflictException(ex.Message, "permission_not_assigned");
+            }
+        }
+
+        await _roleRepository.SaveChangesAsync();
+    }
+
     public async Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId)
     {
         var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
