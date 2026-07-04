@@ -20,6 +20,35 @@ public class RolesController : ControllerBase
         _roleService = roleService;
     }
 
+
+    /*
+        POST: api/roles
+        Creates a new role with the specified name and description.
+        Returns a 201 Created response with the created role's details.
+
+        Body:
+        {
+            "name": "Role Name",
+            "description": "Role Description"
+        }
+
+        Example CURL request :
+        curl -X POST "https://localhost:5001/api/roles" -H "Content-Type: application/json" -d "{\"name\":\"Admin\",\"description\":\"Administrator role\"}"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 201,
+            "message": "Role created successfully.",
+            "data": {
+                "id": "role-id",
+                "name": "Admin",
+                "description": "Administrator role",
+                "createdAt": "2023-10-01T12:34:56Z",
+                "isActive": true
+            }
+        }
+    */
     [HttpPost]
     public async Task<ActionResult<RoleResponse>> Create([FromBody] CreateRoleRequest request)
     {

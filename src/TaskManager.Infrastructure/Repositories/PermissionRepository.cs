@@ -18,11 +18,24 @@ public class PermissionRepository : IPermissionRepository
 
     public async TaskAsync AddAsync(Permission permission)
     {
+        /*
+        * Add a new permission.
+        * @param permission The permission to add.
+        * In PostgreSQL the query will be:
+        * INSERT INTO "Permissions" ("Id", "Name", "Description", "CreatedAt", "UpdatedAt") VALUES ({permission.Id}, {permission.Name}, {permission.Description}, {permission.CreatedAt}, {permission.UpdatedAt});
+        */
         await _db.Permissions.AddAsync(permission);
     }
 
     public async System.Threading.Tasks.Task<List<Permission>> GetAllAsync()
     {
+        /**
+         * Get all permissions that are not deleted.
+         * 
+         * @return List of permissions.
+         * In PostgreSQL the query will be:
+         * SELECT * FROM "Permissions" WHERE "DeletedAt" IS NULL;
+         */
         return await _db.Permissions
             .Where(p => p.DeletedAt == null)
             .ToListAsync();
@@ -30,6 +43,14 @@ public class PermissionRepository : IPermissionRepository
 
     public async System.Threading.Tasks.Task<Permission?> GetByIdAsync(Guid id)
     {
+        /**
+         * Get a permission by id that is not deleted.
+         * 
+         * @param id The id of the permission.
+         * @return The permission or null if not found.
+         * In PostgreSQL the query will be:
+         * SELECT * FROM "Permissions" WHERE "Id" = {id} AND "DeletedAt" IS NULL;
+         */
         return await _db.Permissions
             .FirstOrDefaultAsync(
                 p => p.Id == id && p.DeletedAt == null);
@@ -37,6 +58,12 @@ public class PermissionRepository : IPermissionRepository
 
     public TaskAsync UpdateAsync(Permission permission)
     {
+        /*
+        * Update a permission.
+        * @param permission The permission to update.
+        * In PostgreSQL the query will be:
+        * UPDATE "Permissions" SET "Name" = {permission.Name}, "Description" = {permission.Description}, "UpdatedAt" = {permission.UpdatedAt} WHERE "Id" = {permission.Id};
+        */
         _db.Permissions.Update(permission);
 
         return TaskAsync.CompletedTask;
@@ -44,6 +71,11 @@ public class PermissionRepository : IPermissionRepository
 
     public async TaskAsync SaveChangesAsync()
     {
+        /*
+        * Save changes to the database.
+        * In PostgreSQL the query will be:
+        * COMMIT;
+        */
         await _db.SaveChangesAsync();
     }
 }

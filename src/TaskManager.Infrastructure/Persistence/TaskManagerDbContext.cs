@@ -18,6 +18,8 @@ public class TaskManagerDbContext : DbContext
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
+    public DbSet<User> Users => Set<User>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -32,6 +34,10 @@ public class TaskManagerDbContext : DbContext
 
         modelBuilder.ApplyConfiguration(
             new RolePermissionConfiguration()
+        );
+
+        modelBuilder.ApplyConfiguration(
+            new UserConfiguration()
         );
     }
 

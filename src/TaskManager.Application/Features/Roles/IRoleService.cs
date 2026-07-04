@@ -1,6 +1,7 @@
 using TaskManager.Application.Features.Permissions.DTOs;
 using TaskManager.Application.Features.Roles.DTOs;
 
+namespace TaskManager.Application.Features.Roles;
 public interface IRoleService
 {
     Task<RoleDto> CreateAsync(string name, string description);
