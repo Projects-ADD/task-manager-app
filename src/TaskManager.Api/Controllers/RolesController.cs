@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using TaskManager.Application.Features.Roles;
 using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Contracts.Requests;
@@ -23,17 +24,20 @@ public class RolesController : ControllerBase
     {
         var role = await _roleService.CreateAsync(request.Name, request.Description);
 
+        var response = new ApiResponse<RoleResponse>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.Created,
+            Message = "Role created successfully.",
+            Data = MapToResponse(role)
+        };
+
         return CreatedAtAction(
             nameof(GetById),
             new { id = role.Id },
-            new RoleResponse
-            {
-                Id = role.Id,
-                Name = role.Name,
-                Description = role.Description,
-                CreatedAt = role.CreatedAt,
-                IsActive = role.IsActive
-            });
+            response
+        );
+
     }
 
     [HttpGet]
@@ -41,33 +45,48 @@ public class RolesController : ControllerBase
     {
         var roles = await _roleService.GetAllAsync();
 
-        return Ok(roles.Select(r => new RoleResponse
+        if (roles == null || !roles.Any())
         {
-            Id = r.Id,
-            Name = r.Name,
-            Description = r.Description,
-            CreatedAt = r.CreatedAt,
-            IsActive = r.IsActive
-        }).ToList());
+            return NotFound(new ApiResponse<object>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.NotFound,
+                Message = "No roles found.",
+                Data = null
+            });
+        }
+
+        return Ok(new ApiResponse<List<RoleResponse>>
+        {
+            Action = "get",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Roles retrieved successfully.",
+            Data = roles.Select(MapToResponse).ToList()
+        });
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<RoleResponse>> GetById(Guid id)
+    public async Task<ActionResult<ApiResponse<RoleResponse>>> GetById(Guid id)
     {
         var role = await _roleService.GetByIdAsync(id);
 
         if (role is null)
         {
-            return NotFound();
+            return NotFound(new ApiResponse<object>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.NotFound,
+                Message = "Role not found.",
+                Data = null
+            });
         }
 
-        return Ok(new RoleResponse
+        return Ok(new ApiResponse<RoleResponse>
         {
-            Id = role.Id,
-            Name = role.Name,
-            Description = role.Description,
-            CreatedAt = role.CreatedAt,
-            IsActive = role.IsActive
+            Action = "get",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Role retrieved successfully.",
+            Data = MapToResponse(role)
         });
     }
 
@@ -76,15 +95,50 @@ public class RolesController : ControllerBase
     {
         var updated = await _roleService.UpdateAsync( id, request.Name, request.Description);
 
-        return updated ? NoContent() : NotFound();
+        if (!updated)
+        {
+            return NotFound(new ApiResponse<object>
+            {
+                Action = "put",
+                HttpStatusCode = (int)HttpStatusCode.NotFound,
+                Message = "Role not found.",
+                Data = null
+            });
+        }
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "put",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Role updated successfully.",
+            Data = null
+        });
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
+        //TODO: This function should return the role that was deleted.
         var deleted = await _roleService.DeleteAsync(id);
 
-        return deleted ? NoContent() : NotFound();
+        if (!deleted)
+        {
+            return NotFound(new ApiResponse<object>
+            {
+                Action = "delete",
+                HttpStatusCode = (int)HttpStatusCode.NotFound,
+                Message = "Role not found.",
+                Data = null
+            });
+        }
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "delete",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Role deleted successfully.",
+            Data = null
+        });
     }
 
     [HttpPost("{roleId}/permissions/{permissionId}")]
@@ -92,7 +146,13 @@ public class RolesController : ControllerBase
     {
         await _roleService.AssignPermissionAsync(roleId, permissionId);
 
-        return NoContent();
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = $"Permission {permissionId} assigned to role {roleId} successfully.",
+            Data = null
+        });
     }
 
     [HttpDelete("{roleId}/permissions/{permissionId}")]
@@ -100,6 +160,24 @@ public class RolesController : ControllerBase
     {
         await _roleService.RevokePermissionAsync(roleId, permissionId);
 
-        return NoContent();
+        return Ok(new ApiResponse<object>
+        {
+            Action = "delete",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = $"Permission {permissionId} revoked from role {roleId} successfully.",
+            Data = null
+        });
+    }
+
+    private static RoleResponse MapToResponse(RoleDto role)
+    {
+        return new RoleResponse
+        {
+            Id = role.Id,
+            Name = role.Name,
+            Description = role.Description,
+            CreatedAt = role.CreatedAt,
+            IsActive = role.IsActive
+        };
     }
 }

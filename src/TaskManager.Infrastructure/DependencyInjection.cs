@@ -19,10 +19,6 @@ public static class DependencyInjection
         services.AddDbContext<TaskManagerDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
-
-            options.EnableSensitiveDataLogging();
-
-            options.LogTo(Console.WriteLine);
         });
 
         services.AddScoped<IPermissionRepository, PermissionRepository>();

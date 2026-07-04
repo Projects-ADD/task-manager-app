@@ -1,4 +1,5 @@
 using TaskManager.Application.Common.Interfaces;
+using TaskManager.Application.Common.Exceptions;
 using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Domain.Entities;
 
@@ -86,17 +87,25 @@ public class RoleService : IRoleService
 
         if (role is null)
         {
-            throw new Exception("Role not found");
+            throw new NotFoundException($"Role '{roleId}' was not found.", "role_not_found");  
         }
 
         var permission = await _permissionRepository.GetByIdAsync(permissionId);
 
         if (permission is null)
         {
-            throw new Exception("Permission not found");
+            throw new NotFoundException($"Permission '{permissionId}' was not found.", "permission_not_found");
         }
 
-        role.AssignPermission(permissionId);
+        try
+        {
+            role.AssignPermission(permissionId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException( ex.Message, "permission_already_assigned");
+        }
+
 
         //var rolePermission = new RolePermission( roleId, permissionId );
 
@@ -111,17 +120,24 @@ public class RoleService : IRoleService
 
         if (role is null)
         {
-            throw new Exception("Role not found");
+            throw new NotFoundException($"Role '{roleId}' was not found.", "role_not_found");
         }
 
         var permission = await _permissionRepository.GetByIdAsync(permissionId);
 
         if (permission is null)
         {
-            throw new Exception("Permission not found");
+            throw new NotFoundException($"Permission '{permissionId}' was not found.", "permission_not_found");
         }
 
-        role.RevokePermission(permissionId);
+        try
+        {
+            role.RevokePermission(permissionId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException(ex.Message, "permission_not_assigned");
+        }
 
         await _roleRepository.SaveChangesAsync();
     }
