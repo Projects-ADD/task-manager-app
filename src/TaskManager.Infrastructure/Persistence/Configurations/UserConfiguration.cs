@@ -15,6 +15,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);
         //builder.Property(u => u.PasswordHash).IsRequired().HasMaxLength(200);   //password is private, so we don't need to configure it here
 
-        
+        builder.Property<string>("PassHash")
+            .HasColumnName("PassHash")
+            .IsRequired()
+            .HasMaxLength(200);
     }
 }

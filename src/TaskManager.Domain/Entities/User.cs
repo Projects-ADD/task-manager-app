@@ -22,6 +22,14 @@ public class User : AggregateRoot
 
     //public IReadOnlyCollection<Role> Roles => _roles;
 
+    private User()
+    {
+        Username = null!;
+        FullName = null!;
+        Email = null!;
+        PassHash = null!;
+    } // For EF Core
+
     public User(string username, string fullName, string email, string passHash)
     {
         Id = Guid.NewGuid();
