@@ -15,6 +15,8 @@ public interface IRoleService
 
     Task AssignPermissionAsync(Guid roleId, Guid permissionId);
 
+    Task AssignManyPermissionsAsync(Guid roleId, List<Guid> permissionIds);
+
     Task RevokePermissionAsync(Guid roleId, Guid permissionId);
 
     Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId);

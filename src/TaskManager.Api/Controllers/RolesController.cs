@@ -156,6 +156,21 @@ public class RolesController : ControllerBase
         });
     }
 
+    //TODO: Test this endpoint with Postman or Swagger.
+    [HttpPost("{roleId}/permissions")]
+    public async Task<IActionResult> AssignManyPermissions(Guid roleId, [FromBody] List<Guid> permissionIds)
+    {
+        await _roleService.AssignManyPermissionsAsync(roleId, permissionIds);
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = $"Permissions assigned to role {roleId} successfully.",
+            Data = null
+        });
+    }
+
     [HttpDelete("{roleId}/permissions/{permissionId}")]
     public async Task<IActionResult> RevokePermission(Guid roleId, Guid permissionId)
     {
