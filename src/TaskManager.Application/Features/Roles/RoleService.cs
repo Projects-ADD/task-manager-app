@@ -1,5 +1,6 @@
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Common.Exceptions;
+using TaskManager.Application.Features.Permissions.DTOs;
 using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Domain.Entities;
 
@@ -140,6 +141,27 @@ public class RoleService : IRoleService
         }
 
         await _roleRepository.SaveChangesAsync();
+    }
+
+    public async Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId)
+    {
+        var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
+
+        if (role is null)
+        {
+            throw new NotFoundException($"Role '{roleId}' was not found.", "role_not_found");
+        }
+
+        return role.RolePermissions
+            .Select(rp => new PermissionDto
+            {
+                Id = rp.Permission.Id,
+                Name = rp.Permission.Name,
+                Description = rp.Permission.Description,
+                CreatedAt = rp.Permission.CreatedAt,
+                IsActive = rp.Permission.IsActive
+            })
+            .ToList();
     }
 
     private static RoleDto MapToDto(Role role)

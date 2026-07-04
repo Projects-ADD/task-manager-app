@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskManager.Application.Features.Permissions.DTOs;
 using TaskManager.Application.Features.Roles;
 using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Contracts.Requests;
@@ -169,6 +170,20 @@ public class RolesController : ControllerBase
         });
     }
 
+    [HttpGet("{roleId}/permissions")]
+    public async Task<ActionResult<ApiResponse<List<PermissionResponse>>>> GetPermissionsByRole(Guid roleId)
+    {
+        var permissions = await _roleService.GetPermissionsByRoleAsync(roleId);
+
+        return Ok(new ApiResponse<List<PermissionResponse>>
+        {
+            Action = "get",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Permissions retrieved successfully.",
+            Data = permissions.Select(MapToPermissionResponse).ToList()
+        });
+    }
+
     private static RoleResponse MapToResponse(RoleDto role)
     {
         return new RoleResponse
@@ -178,6 +193,18 @@ public class RolesController : ControllerBase
             Description = role.Description,
             CreatedAt = role.CreatedAt,
             IsActive = role.IsActive
+        };
+    }
+
+    private static PermissionResponse MapToPermissionResponse(PermissionDto permission)
+    {
+        return new PermissionResponse
+        {
+            Id = permission.Id,
+            Name = permission.Name,
+            Description = permission.Description,
+            CreatedAt = permission.CreatedAt,
+            IsActive = permission.IsActive
         };
     }
 }

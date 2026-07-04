@@ -47,16 +47,10 @@ public class RoleRepository : IRoleRepository
 
     public async System.Threading.Tasks.Task<Role?> GetByIdWithPermissionsAsync(Guid roleId)
     {
-        /* return await _db.Roles
-            .Include(r => r.RolePermissions)
-            .ThenInclude(rp => rp.Permission)
-            .FirstOrDefaultAsync(r => r.Id == roleId && r.DeletedAt == null); */
-
         return await _db.Roles
             .Include(r => r.RolePermissions)
-            .FirstOrDefaultAsync(
-                r => r.Id == roleId && r.DeletedAt == null
-            );
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(r => r.Id == roleId && r.DeletedAt == null);
     }
 
     /* public async System.Threading.Tasks.Task AddRolePermissionAsync(RolePermission rolePermission)

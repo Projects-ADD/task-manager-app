@@ -71,12 +71,19 @@ Funciones complementarias:
 
 ## Obtener permisos asociados a un rol
 
-* [ ] Crear endpoint:
+* [x] Crear endpoint:
 
   * `GET /roles/{roleId}/permissions`
-* [ ] Retornar lista de permisos asociados al rol.
-* [ ] Definir DTO de respuesta.
-* [ ] Validar comportamiento cuando el rol no existe.
+* [x] Retornar lista de permisos asociados al rol.
+* [x] Definir DTO de respuesta.
+* [x] Validar comportamiento cuando el rol no existe.
+
+
+[✓] Add GetPermissionsByRoleAsync to IRoleService interface
+[✓] Implement GetPermissionsByRoleAsync in RoleService
+[✓] Update RoleRepository to include Permission navigation in GetByIdWithPermissionsAsync
+[✓] Add GET /roles/{roleId}/permissions endpoint in RolesController
+[✓] Build and verify the project compiles
 
 ---
 

@@ -1,6 +1,5 @@
+using TaskManager.Application.Features.Permissions.DTOs;
 using TaskManager.Application.Features.Roles.DTOs;
-
-using TaskManager.Application.Features.Roles;
 
 public interface IRoleService
 {
@@ -17,4 +16,6 @@ public interface IRoleService
     Task AssignPermissionAsync(Guid roleId, Guid permissionId);
 
     Task RevokePermissionAsync(Guid roleId, Guid permissionId);
+
+    Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId);
 }
