@@ -92,8 +92,32 @@ public class RolesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<RoleResponse>>> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includePermissions = false)
     {
+        if (includePermissions)
+        {
+            var roleWithPermissions = await _roleService.GetByIdWithPermissionsAsync(id);
+
+            if (roleWithPermissions is null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Action = "get",
+                    HttpStatusCode = (int)HttpStatusCode.NotFound,
+                    Message = "Role not found.",
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<RoleWithPermissionsResponse>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.OK,
+                Message = "Role retrieved successfully.",
+                Data = MapToWithPermissionsResponse(roleWithPermissions)
+            });
+        }
+
         var role = await _roleService.GetByIdAsync(id);
 
         if (role is null)

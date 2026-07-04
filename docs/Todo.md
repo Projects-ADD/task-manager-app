@@ -154,14 +154,18 @@ Ejemplo:
 
 ## Obtener detalle de rol con permisos
 
-* [ ] Crear endpoint:
+* [X] Crear endpoint:
 
   * `GET /roles/{id}`
 * [ ] Incluir permisos asociados opcionalmente.
 * [ ] Definir parámetro:
 
   * `includePermissions=true`
-
+  
+[✓] Add GetByIdWithPermissionsAsync to IRoleService
+[✓] Implement GetByIdWithPermissionsAsync in RoleService
+[✓] Update GetById endpoint in RolesController to accept includePermissions param
+[✓] Build and verify compilation
 ---
 
 # Fase 4 - Gestión de usuarios

@@ -24,4 +24,6 @@ public interface IRoleService
     Task<List<PermissionDto>> GetPermissionsByRoleAsync(Guid roleId);
 
     Task<List<RoleWithPermissionsDto>> GetAllWithPermissionsAsync();
+
+    Task<RoleWithPermissionsDto?> GetByIdWithPermissionsAsync(Guid id);
 }

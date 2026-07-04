@@ -228,6 +228,35 @@ public class RoleService : IRoleService
             .ToList();
     }
 
+    public async Task<RoleWithPermissionsDto?> GetByIdWithPermissionsAsync(Guid id)
+    {
+        var role = await _roleRepository.GetByIdWithPermissionsAsync(id);
+
+        if (role is null)
+        {
+            return null;
+        }
+
+        return new RoleWithPermissionsDto
+        {
+            Id = role.Id,
+            Name = role.Name,
+            Description = role.Description,
+            CreatedAt = role.CreatedAt,
+            IsActive = role.IsActive,
+            Permissions = role.RolePermissions
+                .Select(rp => new PermissionDto
+                {
+                    Id = rp.Permission.Id,
+                    Name = rp.Permission.Name,
+                    Description = rp.Permission.Description,
+                    CreatedAt = rp.Permission.CreatedAt,
+                    IsActive = rp.Permission.IsActive
+                })
+                .ToList()
+        };
+    }
+
     public async Task<List<RoleWithPermissionsDto>> GetAllWithPermissionsAsync()
     {
         var roles = await _roleRepository.GetAllWithPermissionsAsync();
