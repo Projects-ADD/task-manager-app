@@ -157,8 +157,8 @@ Ejemplo:
 * [X] Crear endpoint:
 
   * `GET /roles/{id}`
-* [ ] Incluir permisos asociados opcionalmente.
-* [ ] Definir parámetro:
+* [X] Incluir permisos asociados opcionalmente.
+* [X] Definir parámetro:
 
   * `includePermissions=true`
   

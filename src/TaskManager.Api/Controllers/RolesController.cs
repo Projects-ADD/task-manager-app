@@ -91,6 +91,8 @@ public class RolesController : ControllerBase
         });
     }
 
+
+    //TODO: Test this endpoint with Postman or Swagger.
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includePermissions = false)
     {
