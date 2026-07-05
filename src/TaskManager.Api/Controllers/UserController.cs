@@ -72,6 +72,29 @@ public class UserController : ControllerBase
         );
     }
 
+    /*
+        GET /api/users
+        Retrieves a list of all users.
+        Returns a 200 OK response with the list of users if successful, or a 404 Not Found response if no users are found.
+
+        Example CURL request:
+        curl -X GET "https://localhost:5001/api/users"
+
+        Example response:
+        {
+            "action": "get",
+            "httpStatusCode": 200,
+            "message": "Users retrieved successfully.",
+            "data": [
+                {
+                    "id": "guid",
+                    "username": "johndoe",
+                    "fullName": "John Doe",
+                    "email": "johndoe@example.com"
+                }
+            ]
+        }
+    */
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -99,6 +122,27 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
+    /*
+        GET /api/users/{id}
+        Retrieves a user by their unique identifier.
+        Returns a 200 OK response with the user's details if found, or a 404 Not Found response if the user does not exist.
+
+        Example CURL request:
+        curl -X GET "https://localhost:5001/api/users/{id}"
+
+        Example response:
+        {
+            "action": "get",
+            "httpStatusCode": 200,
+            "message": "User retrieved successfully.",
+            "data": {
+                "id": "guid",
+                "username": "johndoe",
+                "fullName": "John Doe",
+                "email": "johndoe@example.com"
+            }
+        }
+    */
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -126,6 +170,21 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
+    /*
+        PUT /api/users/{id}
+        Updates an existing user's details.
+        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
+
+        Body:
+        {
+            "username": "string",
+            "fullName": "string",
+            "email": "string"
+        }
+
+        Example CURL request:
+        curl -X PUT "https://localhost:5001/api/users/{id}" -H "Content-Type: application/json" -d "{\"username\":\"johndoe\",\"fullName\":\"John Doe\",\"email\":\"
+    */
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
@@ -176,6 +235,29 @@ public class UserController : ControllerBase
         });
     } */
 
+
+    /*
+        PUT /api/users/{id}/avatar
+        Updates an existing user's avatar and avatar background.
+        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
+
+        Body:
+        {
+            "avatar": "string",
+            "avatarBg": "string"
+        }
+
+        Example CURL request:
+        curl -X PUT "https://localhost:5001/api/users/{id}/avatar" -H "Content-Type: application/json" -d "{\"avatar\":\"avatar_url\",\"avatarBg\":\"background_url\"}"
+
+        Example response:
+        {
+            "action": "put",
+            "httpStatusCode": 200,
+            "message": "User avatar updated successfully.",
+            "data": null
+        }
+    */
     [HttpPut("{id:guid}/avatar")]
     public async Task<IActionResult> UpdateAvatar(Guid id, [FromBody] UpdateUserAvatarRequest request)
     {
@@ -201,6 +283,27 @@ public class UserController : ControllerBase
         });
     }
 
+    /*
+        PUT /api/users/{id}/password
+        Updates an existing user's password.
+        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
+
+        Body:
+        {
+            "password": "string"
+        }
+
+        Example CURL request:
+        curl -X PUT "https://localhost:5001/api/users/{id}/password" -H "Content-Type: application/json" -d "{\"password\":\"new_password\"}"
+
+        Example response:
+        {
+            "action": "put",
+            "httpStatusCode": 200,
+            "message": "User password updated successfully.",
+            "data": null
+        }
+    */
     //TODO: Check the security implications of allowing password updates through an API endpoint. Consider implementing additional security measures such as authentication and authorization checks, rate limiting, and logging of password change attempts.
     [HttpPut("{id:guid}/password")]
     public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] UpdateUserPasswordRequest request)
@@ -227,6 +330,22 @@ public class UserController : ControllerBase
         });
     }
 
+    /*
+        DELETE /api/users/{id}
+        Deletes an existing user.
+        Returns a 200 OK response if the deletion is successful, or a 404 Not Found response if the user does not exist.
+
+        Example CURL request:
+        curl -X DELETE "https://localhost:5001/api/users/{id}"
+
+        Example response:
+        {
+            "action": "delete",
+            "httpStatusCode": 200,
+            "message": "User deleted successfully.",
+            "data": null
+        }
+    */
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

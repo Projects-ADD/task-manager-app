@@ -129,6 +129,12 @@ O abrir `http://localhost:5000` en el navegador.
 ## Comandos disponibles
 
 ```bash
+# Limpiar la solución completa
+dotnet clean
+
+# Restaurar paquetes NuGet (Opcional, se hace automáticamente al compilar)
+dotnet restore
+
 # Compilar la solución completa
 dotnet build
 

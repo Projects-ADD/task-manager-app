@@ -18,6 +18,34 @@ public class PermissionsController : ControllerBase
         _permissionService = permissionService;
     }
 
+    /*
+        POST /api/permissions
+        Creates a new permission.
+        Returns a 201 Created response if the creation is successful.
+
+        Body:
+        {
+            "name": "string",
+            "description": "string"
+        }
+
+        Example CURL request:
+        curl -X POST "https://localhost:5001/api/permissions" -H "Content-Type: application/json" -d "{\"name\":\"permission_name\",\"description\":\"permission_description\"}"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 201,
+            "message": "Permission created successfully.",
+            "data": {
+                "id": "guid",
+                "name": "string",
+                "description": "string",
+                "createdAt": "2024-06-01T00:00:00Z",
+                "isActive": true
+            }
+        }
+    */
     [HttpPost]
     public async Task<ActionResult<PermissionResponse>> Create([FromBody] CreatePermissionRequest request)
     {
@@ -38,6 +66,30 @@ public class PermissionsController : ControllerBase
         );
     }
 
+    /*
+        GET /api/permissions
+        Retrieves all permissions.
+        Returns a 200 OK response with the list of permissions.
+
+        Example CURL request:
+        curl -X GET "https://localhost:5001/api/permissions"
+        
+        Example response:
+        {
+            "action": "get",
+            "httpStatusCode": 200,
+            "message": "Permissions retrieved successfully.",
+            "data": [
+                {
+                    "id": "guid",
+                    "name": "string",
+                    "description": "string",
+                    "createdAt": "2024-06-01T00:00:00Z",
+                    "isActive": true
+                }
+            ]
+        }
+    */
     [HttpGet]
     public async Task<ActionResult<List<PermissionResponse>>> GetAll()
     {
@@ -74,6 +126,36 @@ public class PermissionsController : ControllerBase
         //return Ok(permissions.Select(MapToResponse).ToList());
     }
 
+    /*
+        GET /api/permissions/{id}
+        Retrieves a permission by its ID.
+        Returns a 200 OK response with the permission details if found, or a 404 Not Found response if not found.
+
+        Example CURL request:
+        curl -X GET "https://localhost:5001/api/permissions/{id}"
+        
+        Example response (if found):
+        {
+            "action": "get",
+            "httpStatusCode": 200,
+            "message": "Permission retrieved successfully.",
+            "data": {
+                "id": "guid",
+                "name": "string",
+                "description": "string",
+                "createdAt": "2024-06-01T00:00:00Z",
+                "isActive": true
+            }
+        }
+
+        Example response (if not found):
+        {
+            "action": "get",
+            "httpStatusCode": 404,
+            "message": "Permission not found.",
+            "data": null
+        }
+    */
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse<PermissionResponse>>> GetById(Guid id)
     {
@@ -101,6 +183,36 @@ public class PermissionsController : ControllerBase
         //return Ok(MapToResponse(permission));
     }
 
+    /*
+        PUT /api/permissions/{id}
+        Updates a permission by its ID.
+        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the permission is not found.
+
+        Body:
+        {
+            "name": "string",
+            "description": "string"
+        }
+
+        Example CURL request:
+        curl -X PUT "https://localhost:5001/api/permissions/{id}" -H "Content-Type: application/json" -d "{\"name\":\"updated_name\",\"description\":\"updated_description\"}"
+
+        Example response (if updated):
+        {
+            "action": "put",
+            "httpStatusCode": 200,
+            "message": "Permission updated successfully.",
+            "data": null
+        }
+
+        Example response (if not found):
+        {
+            "action": "put",
+            "httpStatusCode": 404,
+            "message": "Permission not found.",
+            "data": null
+        }
+    */
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ApiResponse<object>>> Update(Guid id, [FromBody] UpdatePermissionRequest request)
     {
@@ -126,6 +238,30 @@ public class PermissionsController : ControllerBase
         });
     }
 
+    /*
+        DELETE /api/permissions/{id}
+        Deletes a permission by its ID.
+        Returns a 200 OK response if the deletion is successful, or a 404 Not Found response if the permission is not found.
+
+        Example CURL request:
+        curl -X DELETE "https://localhost:5001/api/permissions/{id}"
+
+        Example response (if deleted):
+        {
+            "action": "delete",
+            "httpStatusCode": 200,
+            "message": "Permission deleted successfully.",
+            "data": null
+        }
+
+        Example response (if not found):
+        {
+            "action": "delete",
+            "httpStatusCode": 404,
+            "message": "Permission not found.",
+            "data": null
+        }
+    */
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ApiResponse<object>>> Delete(Guid id)
     {
