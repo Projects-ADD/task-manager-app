@@ -20,6 +20,8 @@ public class TaskManagerDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<TaskManager.Domain.Entities.Task> Tasks => Set<TaskManager.Domain.Entities.Task>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -38,6 +40,10 @@ public class TaskManagerDbContext : DbContext
 
         modelBuilder.ApplyConfiguration(
             new UserConfiguration()
+        );
+
+        modelBuilder.ApplyConfiguration(
+            new TaskConfiguration()
         );
     }
 

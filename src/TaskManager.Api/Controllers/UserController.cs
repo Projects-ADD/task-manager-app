@@ -7,8 +7,6 @@ using TaskManager.Contracts.Responses;
 
 namespace TaskManager.Api.Controllers;
 
-
-//TODO: Test this controller with Postman or Swagger.
 [ApiController]
 //[Route("api/[controller]")]
 [Route("api/users")]
