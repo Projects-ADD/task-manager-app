@@ -70,20 +70,35 @@ Render soporta despliegue desde Docker o desde un archivo `render.yaml` (Bluepri
 **Opción A — Desde el dashboard (manual):**
 
 1. Conecta tu repositorio de GitHub a Render.
-2. Crea un **Web Service** → elige el repo → **Deploy from Docker**.
-3. **Dockerfile Path**: `docker/Dockerfile.api`
-4. **Port**: `8080`
-5. Agrega un **PostgreSQL** desde el dashboard de Render (plan free).
-6. Variables de entorno del Web Service:
+2. Crea primero una base de datos **PostgreSQL** desde el dashboard de Render.
+3. Espera a que la instancia quede aprovisionada y copia su **External Database URL** o la cadena de conexión equivalente.
+4. Crea un **Web Service** y selecciona el mismo repositorio.
+5. En el tipo de despliegue, elige **Docker** para que Render construya la imagen desde el repositorio.
+6. Configura el servicio con estos valores mínimos:
+   - **Branch**: `main`
+   - **Dockerfile Path**: `docker/Dockerfile.api`
+   - **Docker Context**: repositorio raíz (`.`)
+   - **Health Check Path**: `/`
+7. Define estas variables de entorno en el Web Service:
    - `ASPNETCORE_ENVIRONMENT=Production`
    - `ASPNETCORE_URLS=http://+:8080`
-   - `ConnectionStrings__DefaultConnection=<cadena-de-neon-o-render-db>`
+   - `ConnectionStrings__DefaultConnection=<cadena-del-PostgreSQL-de-Render>`
+8. Crea el Web Service y espera a que termine el primer build.
+9. Aplica las migraciones contra la base de datos de Render desde tu máquina local:
+   ```bash
+   dotnet ef database update \
+     --project src/TaskManager.Infrastructure \
+     --startup-project src/TaskManager.Api
+   ```
+10. Verifica el despliegue abriendo la URL pública del servicio o haciendo una petición a `/`.
+
+> En esta opción manual no debes usar `runtime: image` ni proporcionar una imagen preconstruida. Aquí Render construye el contenedor desde `docker/Dockerfile.api`.
 
 **Opción B — Blueprint (`render.yaml`):**
 
 Ya existe un archivo [`render.yaml`](render.yaml) en la raíz del proyecto que define:
 
-- **Web Service** `task-manager-api` — construye desde `docker/Dockerfile.api` y expone puerto `8080`.
+- **Web Service** `task-manager-api` — usa `runtime: docker`, construye desde `docker/Dockerfile.api` y expone puerto `8080`.
 - **PostgreSQL** `taskmanager-db` — base de datos administrada por Render (plan free).
 
 Solo tienes que:
