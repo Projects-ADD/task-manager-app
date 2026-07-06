@@ -1,0 +1,14 @@
+**/.git
+**/.gitignore
+**/.vs
+**/bin
+**/obj
+**/.editorconfig
+**/global.json
+**/instructions
+**/ia
+**/docs
+**/scripts
+**/*.md
+**/LICENSE
+**/NOTICE.md

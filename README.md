@@ -94,12 +94,12 @@ cd task-manager-app
 ### 2. Iniciar PostgreSQL
 
 ```bash
-docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml up -d postgres
 ```
 
-Esto levanta PostgreSQL 17 en `localhost:5432`, base de datos `task_manager`, usuario `postgres`, contraseña `postgres`.
+Esto levanta PostgreSQL 17 en `localhost:5432`, base de datos `taskmanager`, usuario `postgres`, contraseña `postgres`.
 
-### 3. Aplicar migraciones (opcional, se aplican automáticamente al iniciar)
+### 3. Aplicar migraciones
 
 ```bash
 dotnet ef database update --project src/TaskManager.Infrastructure --startup-project src/TaskManager.Api
@@ -113,16 +113,16 @@ dotnet run --project src/TaskManager.Api
 
 La API se inicia en:
 - HTTP: `http://localhost:5225`
-- HTTPS: `https://localhost:7000`
+- HTTPS: `https://localhost:7100`
 
 ### 5. Verificar
 
 ```bash
-curl http://localhost:5000
+curl http://localhost:5225
 # → "Task Manager API running"
 ```
 
-O abrir `http://localhost:5000` en el navegador.
+O abrir `http://localhost:5225` en el navegador.
 
 ---
 
@@ -159,13 +159,33 @@ dotnet ef database update \
     --project src/TaskManager.Infrastructure \
     --startup-project src/TaskManager.Api
 
-# Iniciar PostgreSQL
+# Iniciar sólo PostgreSQL
+docker compose -f docker/docker-compose.yml up -d postgres
+
+# Iniciar sólo la API (requiere BD externa)
+docker compose -f docker/docker-compose.yml up -d api
+
+# Iniciar API + PostgreSQL (todo con Docker)
 docker compose -f docker/docker-compose.yml up -d
 
-# Detener PostgreSQL
+# Detener servicios (juntos)
 docker compose -f docker/docker-compose.yml down
 
-# Ver logs de PostgreSQL
+# Detener servicios (uno por uno)
+docker compose -f docker/docker-compose.yml stop <servicio>
+
+#Detener servicios y eliminar contenedores, redes y volúmenes
+docker compose -f docker/docker-compose.yml down -v 
+
+# Detener servicios y eliminar contenedores, redes y volúmenes (uno por uno)
+docker compose -f docker/docker-compose.yml down -v <servicio>
+
+# Reiniciar servicios (uno por uno)
+docker compose -f docker/docker-compose.yml restart <servicio>
+
+
+
+# Ver logs
 docker compose -f docker/docker-compose.yml logs -f
 ```
 
@@ -218,7 +238,7 @@ task-manager-app/
 │   ├── TaskManager.Infrastructure/ # EF Core, repositorios, migraciones
 │   └── TaskManager.Contracts/    # Request/Response DTOs públicos
 ├── docker/
-│   ├── docker-compose.yml        # PostgreSQL 17
+│   ├── docker-compose.yml        # PostgreSQL 17 + API
 │   └── Dockerfile.api            # Build de producción para la API
 ├── tests/                        # Proyectos de test (pendiente)
 ├── docs/                         # Documentación y diagramas
@@ -234,23 +254,42 @@ task-manager-app/
 
 ## Despliegue
 
-### Build para Docker
+### Docker (API + PostgreSQL)
+
+Levanta ambos servicios (base de datos y API) con un solo comando:
+
+```bash
+docker compose -f docker/docker-compose.yml up -d
+```
+
+La API queda disponible en `http://localhost:5000` y PostgreSQL en `localhost:5432`.
+
+Para aplicar las migraciones automáticamente al iniciar el contenedor, ejecuta:
+
+```bash
+dotnet ef database update \
+    --project src/TaskManager.Infrastructure \
+    --startup-project src/TaskManager.Api
+```
+
+> Si la base de datos es externa (Neon.tech, OCI, etc.), sobrescribe la variable `ConnectionStrings__DefaultConnection` al iniciar el contenedor.
+
+### Construir la imagen manualmente
 
 ```bash
 docker build -f docker/Dockerfile.api -t task-manager-api .
 ```
 
-### Ejecutar contenedor
+### Ejecutar solo la API (conectada a una BD externa)
 
 ```bash
 docker run -d \
-  -p 5000:8080 \
-  -e ConnectionStrings__DefaultConnection="Host=host.docker.internal;Port=5432;Database=task_manager;Username=postgres;Password=postgres" \
   --name task-manager-api \
+  -p 5000:8080 \
+  -e ASPNETCORE_ENVIRONMENT=Production \
+  -e ConnectionStrings__DefaultConnection="Host=<host>;Port=5432;Database=taskmanager;Username=<user>;Password=<password>" \
   task-manager-api
 ```
-
-> Nota: en producción, reemplazar la cadena de conexión por variables de entorno seguras o un secreto administrado externamente.
 
 ### Publicación directa (sin Docker)
 
@@ -264,6 +303,60 @@ dotnet TaskManager.Api.dll
 
 ---
 
+### Despliegue en Oracle OCI (Oracle Cloud Infrastructure)
+
+1. **Crea una instancia de VM** (Oracle Linux o Ubuntu) con acceso a puerto 5000.
+2. **Instala Docker** en la VM:
+   ```bash
+   sudo dnf install -y docker
+   sudo systemctl enable --now docker
+   ```
+3. **Sube la imagen** a un registro (Oracle Container Registry, Docker Hub, o cárgala directo):
+   ```bash
+   docker build -f docker/Dockerfile.api -t task-manager-api .
+   docker tag task-manager-api <region>.ocir.io/<namespace>/task-manager-api:latest
+   docker push <region>.ocir.io/<namespace>/task-manager-api:latest
+   ```
+4. **En la VM, ejecuta el contenedor** apuntando a tu base de datos PostgreSQL (puede ser OCI MySQL/PostgreSQL o externa):
+   ```bash
+   docker run -d \
+     --name task-manager-api \
+     -p 5000:8080 \
+     -e ASPNETCORE_ENVIRONMENT=Production \
+     -e ConnectionStrings__DefaultConnection="Host=<oci-db-host>;Port=5432;Database=taskmanager;Username=<user>;Password=<password>" \
+     <region>.ocir.io/<namespace>/task-manager-api:latest
+   ```
+5. **Aplica migraciones** (ejecutar dentro del contenedor o desde tu máquina si la BD es accesible):
+   ```bash
+   dotnet ef database update \
+     --project src/TaskManager.Infrastructure \
+     --startup-project src/TaskManager.Api
+   ```
+
+### Despliegue con Neon.tech (PostgreSQL serverless) + contenedor local/cloud
+
+1. **Crea una base de datos gratuita** en [Neon.tech](https://neon.tech).
+2. **Obtén la cadena de conexión** (parecida a `Host=ep-xxx.us-east-2.aws.neon.tech;...;sslmode=require`).
+3. **Ejecuta el contenedor de la API apuntando a Neon**:
+   ```bash
+   docker run -d \
+     --name task-manager-api \
+     -p 5000:8080 \
+     -e ASPNETCORE_ENVIRONMENT=Production \
+     -e ConnectionStrings__DefaultConnection="Host=<neon-host>;Port=5432;Database=taskmanager;Username=<user>;Password=<password>;sslmode=require" \
+     task-manager-api
+   ```
+4. **Aplica migraciones** desde tu máquina local (necesitas la cadena de Neon configurada en `appsettings.json` o vía variable):
+   ```bash
+   dotnet ef database update \
+     --project src/TaskManager.Infrastructure \
+     --startup-project src/TaskManager.Api
+   ```
+
+> ⚠️ **Importante**: en producción, no uses la cadena de conexión directamente en variables de entorno. Usa un administrador de secretos (OCI Vault, AWS Secrets Manager, o variables de entorno cifradas).
+
+---
+
 ## Estado del proyecto
 
 El proyecto se encuentra en fase de construcción activa:
@@ -271,7 +364,8 @@ El proyecto se encuentra en fase de construcción activa:
 - ✅ Arquitectura fundamental definida y funcional
 - ✅ Flujo CRUD completo para `Permission`
 - ✅ Flujo CRUD completo para `Role`
-- 🔄 `User`, `Task`, `TaskAssignment` — entidades definidas, lógica de negocio pendiente
+- ✅ Flujo CRUD completo para `Task`
+- 🔄 `User`, `TaskAssignment` — entidades definidas, lógica de negocio pendiente
 - ⏳ Eventos de dominio — por conectar
 - ⏳ Tests unitarios, de integración y de arquitectura — por implementar
 - ⏳ Autenticación JWT — por implementar

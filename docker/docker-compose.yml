@@ -25,5 +25,27 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  api:
+
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+
+    container_name: task-manager-api
+
+    restart: always
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=taskmanager;Username=postgres;Password=postgres
+
+    ports:
+      - "5000:8080"
+
 volumes:
   postgres_data:
