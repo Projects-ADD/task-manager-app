@@ -4,8 +4,8 @@ services:
     runtime: image
     repo: https://github.com/Projects-ADD/task-manager-app
     branch: main
-    dockerfilePath: docker/Dockerfile.api
-    healthCheckPath: /
+    dockerfilePath: ../docker/Dockerfile.api
+    healthCheckPath: ../
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
