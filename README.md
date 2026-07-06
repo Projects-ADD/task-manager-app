@@ -357,6 +357,40 @@ dotnet TaskManager.Api.dll
 
 ---
 
+### Despliegue en Render.com
+
+Render soporta despliegue desde Docker o desde un archivo `render.yaml` (Blueprints).
+
+**Opción A — Desde el dashboard (manual):**
+
+1. Conecta tu repositorio de GitHub a Render.
+2. Crea un **Web Service** → elige el repo → **Deploy from Docker**.
+3. **Dockerfile Path**: `docker/Dockerfile.api`
+4. **Port**: `8080`
+5. Agrega un **PostgreSQL** desde el dashboard de Render (plan free).
+6. Variables de entorno del Web Service:
+   - `ASPNETCORE_ENVIRONMENT=Production`
+   - `ASPNETCORE_URLS=http://+:8080`
+   - `ConnectionStrings__DefaultConnection=<cadena-de-neon-o-render-db>`
+
+**Opción B — Blueprint (`render.yaml`):**
+
+Ya existe un archivo [`render.yaml`](render.yaml) en la raíz del proyecto que define:
+
+- **Web Service** `task-manager-api` — construye desde `docker/Dockerfile.api` y expone puerto `8080`.
+- **PostgreSQL** `taskmanager-db` — base de datos administrada por Render (plan free).
+
+Solo tienes que:
+
+1. Sustituir `repo: https://github.com/<tu-usuario>/<tu-repo>` en `render.yaml` con tu repositorio real.
+2. Conectar tu repo a Render.
+3. Ir a **Dashboard → Blueprint** y seleccionar el repo.
+4. Render detecta el `render.yaml` y crea automáticamente la base de datos + el servicio web, inyectando la variable `ConnectionStrings__DefaultConnection` con la cadena correcta.
+
+> Render tarda ~2-3 minutos en aprovisionar la BD gratuita. Después del primer deploy, las migraciones deben aplicarse manualmente (Render no ejecuta `dotnet ef database update` automáticamente).
+
+---
+
 ## Estado del proyecto
 
 El proyecto se encuentra en fase de construcción activa:
