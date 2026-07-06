@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: task-manager-api
+    runtime: image
+    repo: https://github.com/Projects-ADD/task-manager-app
+    branch: main
+    dockerfilePath: ./docker/Dockerfile.api
+    healthCheckPath: /
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: taskmanager-db
+          property: connectionString
+
+databases:
+  - name: taskmanager-db
+    databaseName: taskmanager
+    plan: free
