@@ -52,6 +52,7 @@ public class TaskController : ControllerBase
      *     }
      * }
      */
+     //TODO: The dueDate field is not being saving correctly in the database, it is being saved as bad date. Need to investigate and fix this issue.
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<TaskResponse>), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.BadRequest)]
@@ -259,6 +260,7 @@ public class TaskController : ControllerBase
     *     "data": "Error details..."
     * }
     */
+    //TODO: The dueDate field is not being saving correctly in the database, it is being saved as bad date. Need to investigate and fix this issue.
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.BadRequest)]
