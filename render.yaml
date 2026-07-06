@@ -1,7 +1,7 @@
 services:
   - type: web
     name: task-manager-api
-    runtime: image
+    runtime: docker
     repo: https://github.com/Projects-ADD/task-manager-app
     branch: main
     dockerfilePath: ./docker/Dockerfile.api
