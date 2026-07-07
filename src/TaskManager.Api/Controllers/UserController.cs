@@ -480,6 +480,43 @@ public class UserController : ControllerBase
         });
     }
 
+    /*
+        POST /api/users/{userId}/roles
+        Assigns multiple roles to an existing user.
+        Returns a 200 OK response if the assignment is successful, or a 404 Not Found response if the user or any of the roles do not exist.
+
+        Body:
+        [
+            "roleId1",
+            "roleId2",
+            "roleId3"
+        ]
+
+        Example CURL request:
+        curl -X POST "https://localhost:5001/api/users/{userId}/roles" -H "Content-Type: application/json" -d "[\"roleId1\",\"roleId2\",\"roleId3\"]"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 200,
+            "message": "Roles assigned successfully.",
+            "data": null
+        }
+    */
+    [HttpPost("{userId:guid}/roles")]
+    public async Task<IActionResult> AssignManyRoles(Guid userId, [FromBody] List<Guid> roleIds)
+    {
+        await _userService.AssignManyRolesAsync(userId, roleIds);
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Roles assigned successfully.",
+            Data = null
+        });
+    }
+
     private static UserResponse MapToResponse(UserDto userDto)
     {
         return new UserResponse

@@ -164,6 +164,44 @@ public class UserService : IUserService
         await _userRepository.SaveChangesAsync();
     }
 
+    public async System.Threading.Tasks.Task AssignManyRolesAsync(Guid userId, List<Guid> roleIds)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+
+        if (user is null)
+        {
+            throw new NotFoundException($"User with ID {userId} not found.");
+        }
+
+        // Validate that all roles exist before assigning any
+        foreach (var roleId in roleIds)
+        {
+            var role = await _roleRepository.GetByIdAsync(roleId);
+
+            if (role is null)
+            {
+                throw new NotFoundException($"Role with ID {roleId} not found.");
+            }
+        }
+
+        // Assign roles to the user
+        foreach (var roleId in roleIds)
+        {
+            try
+            {
+                user.AssignRole(roleId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // TODO: Handle the case where the user is already assigned to the role
+                // You can log the exception or ignore it based on your requirements
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        await _userRepository.SaveChangesAsync();
+    }
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id);

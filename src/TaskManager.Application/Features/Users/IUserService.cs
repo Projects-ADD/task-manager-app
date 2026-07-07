@@ -22,5 +22,7 @@ public interface IUserService
 
     Task AssignRoleAsync(Guid userId, Guid roleId);
 
+    Task AssignManyRolesAsync(Guid userId, List<Guid> roleIds);
+
     Task<bool> DeleteAsync(Guid id);
 }
