@@ -78,6 +78,26 @@ public class RoleRepository : IRoleRepository
         await _db.SaveChangesAsync();
     }
 
+    public async System.Threading.Tasks.Task<Role?> GetOneWithUsersAsync(Guid roleId)
+    {
+        /**
+         * Get a role by id that is not deleted, including its associated users.
+         * 
+         * @param roleId The id of the role.
+         * @return The role with its associated users or null if not found.
+         *
+         * In PostgreSQL the query will be:
+         * SELECT r.*, u.* FROM "Roles" r
+         * LEFT JOIN "UserRoles" ur ON r."Id" = ur."RoleId"
+         * LEFT JOIN "Users" u ON ur."UserId" = u."Id"
+         * WHERE r."Id" = {roleId} AND r."DeletedAt" IS NULL;
+        */
+        return await _db.Roles
+            .Include(r => r.UserRoles)
+            .ThenInclude(ur => ur.User)
+            .FirstOrDefaultAsync(r => r.Id == roleId && r.DeletedAt == null);
+    }
+
     public async System.Threading.Tasks.Task<Role?> GetByIdWithPermissionsAsync(Guid roleId)
     {
         /**

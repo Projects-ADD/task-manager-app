@@ -10,11 +10,14 @@ public class RoleService : IRoleService
 {
     private readonly IRoleRepository _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
+    private readonly IUserRepository _userRepository;
 
-    public RoleService(IRoleRepository roleRepository, IPermissionRepository permissionRepository)
+    public RoleService(IRoleRepository roleRepository, IPermissionRepository permissionRepository, IUserRepository userRepository)
     {
         _roleRepository = roleRepository;
+        
         _permissionRepository = permissionRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<RoleDto> CreateAsync(string name, string description)
@@ -80,6 +83,38 @@ public class RoleService : IRoleService
         await _roleRepository.SaveChangesAsync();
 
         return true;
+    }
+
+    public async System.Threading.Tasks.Task AssignManyUsersAsync(Guid roleId, List<Guid> userIds)
+    {
+        var role = await _roleRepository.GetOneWithUsersAsync(roleId);
+
+        if (role is null)
+        {
+            throw new NotFoundException($"Role '{roleId}' was not found.", "role_not_found");
+        }
+
+        // Validate that all users exist before assigning any
+        foreach (var userId in userIds)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user is null)
+            {
+                throw new NotFoundException($"User '{userId}' was not found.", "user_not_found");
+            }
+
+            try
+            {
+                role.AssignUser(userId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new ConflictException(ex.Message, "user_already_assigned");
+            }
+        }
+
+        await _roleRepository.SaveChangesAsync();
     }
 
     public async System.Threading.Tasks.Task AssignManyPermissionsAsync(Guid roleId, List<Guid> permissionIds)

@@ -18,6 +18,8 @@ public interface IRoleService
 
     Task AssignManyPermissionsAsync(Guid roleId, List<Guid> permissionIds);
 
+    Task AssignManyUsersAsync(Guid roleId, List<Guid> userIds);
+
     Task RevokePermissionAsync(Guid roleId, Guid permissionId);
 
     Task RevokeManyPermissionsAsync(Guid roleId, List<Guid> permissionIds);

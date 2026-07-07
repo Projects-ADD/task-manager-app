@@ -14,6 +14,8 @@ public interface IRoleRepository
 
     System.Threading.Tasks.Task SaveChangesAsync();
 
+    System.Threading.Tasks.Task<Role?> GetOneWithUsersAsync(Guid roleId);
+
     System.Threading.Tasks.Task<Role?> GetByIdWithPermissionsAsync(Guid roleId);
 
     System.Threading.Tasks.Task<List<Role>> GetAllWithPermissionsAsync();

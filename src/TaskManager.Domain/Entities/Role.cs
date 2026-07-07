@@ -33,7 +33,22 @@ public class Role : AggregateRoot
         DeletedAt = DateTime.UtcNow;
     }
 
-    //public IReadOnlyCollection<Permission> Permissions => _permissions;
+    public void AssignUser(Guid userId)
+    {
+        bool alreadyAssigned = UserRoles.Any(ur => ur.UserId == userId);
+
+        if (alreadyAssigned)
+        {
+            throw new InvalidOperationException("User is already assigned to the role.");
+        }
+
+        UserRoles.Add(
+            new UserRoles(
+                userId,
+                Id
+            )
+        );
+    }
 
     public void AssignPermission(Guid permissionId)
     {
