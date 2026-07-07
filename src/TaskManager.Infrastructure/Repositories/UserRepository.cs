@@ -56,6 +56,30 @@ public class UserRepository : IUserRepository
                 u => u.Id == id && u.DeletedAt == null);
     }
 
+    public async System.Threading.Tasks.Task<User?> GetOneWithPermissionsAsync(Guid userId)
+    {
+        /**
+         * Get a user by id that is not deleted, including their roles and permissions.
+         * 
+         * @param userId The id of the user.
+         * @return The user with roles and permissions or null if not found.
+         *
+         * In PostgreSQL the query will be:
+         * SELECT * FROM "Users" u
+         * LEFT JOIN "UserRoles" ur ON u."Id" = ur."UserId"
+         * LEFT JOIN "Roles" r ON ur."RoleId" = r."Id"
+         * LEFT JOIN "RolePermissions" rp ON r."Id" = rp."RoleId"
+         * LEFT JOIN "Permissions" p ON rp."PermissionId" = p."Id"
+         * WHERE u."Id" = {userId} AND u."DeletedAt" IS NULL;
+        */
+        return await _db.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                    .ThenInclude(r => r.RolePermissions)
+                        .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null);
+    }
+
     public TaskAsync UpdateAsync(User user)
     {   
         /*

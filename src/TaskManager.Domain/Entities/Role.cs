@@ -9,6 +9,8 @@ public class Role : AggregateRoot
     public string Description { get; private set; }
 
     public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
+    
+    public ICollection<UserRoles> UserRoles { get; private set; } = new List<UserRoles>();
     //private readonly List<Permission> _permissions = [];
 
     public Role(string name, string description)

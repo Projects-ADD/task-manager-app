@@ -373,7 +373,7 @@ public class RolesController : ControllerBase
             "data": null
         }
     */
-    [HttpPost("{roleId}/permissions/{permissionId}")]
+    [HttpPost("{roleId:guid}/permissions/{permissionId:guid}")]
     public async Task<IActionResult> AssignPermission(Guid roleId, Guid permissionId)
     {
         await _roleService.AssignPermissionAsync(roleId, permissionId);

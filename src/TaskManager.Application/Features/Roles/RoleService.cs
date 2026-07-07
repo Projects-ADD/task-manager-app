@@ -116,6 +116,7 @@ public class RoleService : IRoleService
 
     public async System.Threading.Tasks.Task AssignPermissionAsync(Guid roleId, Guid permissionId)
     {
+        //TODO: check if the method GetByIdWithPermissionsAsync is necessary or if we can just use GetByIdAsync and then load the permissions separately.
         var role = await _roleRepository.GetByIdWithPermissionsAsync(roleId);
 
         if (role is null)
@@ -232,6 +233,7 @@ public class RoleService : IRoleService
     {
         var role = await _roleRepository.GetByIdWithPermissionsAsync(id);
 
+        //TODO: Consider whether we should throw a NotFoundException here instead of returning null, to maintain consistency with other methods in this service.
         if (role is null)
         {
             return null;

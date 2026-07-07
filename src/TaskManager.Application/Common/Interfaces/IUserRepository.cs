@@ -13,4 +13,6 @@ public interface IUserRepository
     TaskAsync UpdateAsync(User user);
 
     TaskAsync SaveChangesAsync();
+
+    System.Threading.Tasks.Task<User?> GetOneWithPermissionsAsync(Guid userId);
 }

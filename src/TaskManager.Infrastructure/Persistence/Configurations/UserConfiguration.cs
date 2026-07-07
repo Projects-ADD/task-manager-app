@@ -13,11 +13,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Username).IsRequired().HasMaxLength(50);
         builder.Property(u => u.FullName).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);
+        //builder.Property(u => u.Avatar).HasMaxLength(200);
+        //builder.Property(u => u.AvatarBg).HasMaxLength(200);
         //builder.Property(u => u.PasswordHash).IsRequired().HasMaxLength(200);   //password is private, so we don't need to configure it here
 
         builder.Property<string>("PassHash")
             .HasColumnName("PassHash")
             .IsRequired()
             .HasMaxLength(200);
+
+        builder
+            .HasMany(u => u.UserRoles)
+            .WithOne(ur => ur.User)
+            .HasForeignKey(ur => ur.UserId);
     }
 }

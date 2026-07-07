@@ -1,6 +1,7 @@
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Common.Exceptions;
 using TaskManager.Application.Features.Users.DTOs;
+using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Domain.Entities;
 
 namespace TaskManager.Application.Features.Users;
@@ -8,10 +9,12 @@ namespace TaskManager.Application.Features.Users;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IRoleRepository _roleRepository;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IRoleRepository roleRepository)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
     }
 
     public async Task<UserDto> CreateAsync(string username, string fullName, string email, string password)
@@ -43,6 +46,37 @@ public class UserService : IUserService
         }
 
         return MapToDto(user);
+    }
+
+    public async Task<UserWithRolesDto?> GetOneWithRolesAsync(Guid userId)
+    {
+        var user = await _userRepository.GetOneWithPermissionsAsync(userId);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        var roles = user.UserRoles.Select(ur => new RoleDto
+        {
+            Id = ur.Role.Id,
+            Name = ur.Role.Name,
+            Description = ur.Role.Description
+        }).ToList();
+
+        return new UserWithRolesDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            FullName = user.FullName,
+            Email = user.Email,
+            Avatar = user.Avatar is null ? string.Empty : user.Avatar,
+            AvatarBg = user.AvatarBg is null ? string.Empty : user.AvatarBg,
+            LastSession = user.LastSession,
+            CreatedAt = user.CreatedAt,
+            IsActive = user.IsActive,
+            Roles = roles
+        };
     }
 
     public async Task<bool> UpdateAsync(Guid id, string username, string fullName, string email)
@@ -109,6 +143,27 @@ public class UserService : IUserService
         return true;
     }
 
+    public async System.Threading.Tasks.Task AssignRoleAsync(Guid userId, Guid roleId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+
+        if (user is null)
+        {
+            throw new NotFoundException($"User with ID {userId} not found.");
+        }
+
+        var role = await _roleRepository.GetByIdAsync(roleId);
+
+        if (role is null)
+        {
+            throw new NotFoundException($"Role with ID {roleId} not found.");
+        }
+
+        user.AssignRole(roleId);
+
+        await _userRepository.SaveChangesAsync();
+    }
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var user = await _userRepository.GetByIdAsync(id);
@@ -133,8 +188,8 @@ public class UserService : IUserService
             Username = user.Username,
             FullName = user.FullName,
             Email = user.Email,
-            Avatar = user.Avatar,
-            AvatarBg = user.AvatarBg,
+            Avatar = user.Avatar is null ? string.Empty : user.Avatar,
+            AvatarBg = user.AvatarBg is null ? string.Empty : user.AvatarBg,
             LastSession = user.LastSession,
             CreatedAt = user.CreatedAt,
             IsActive = user.IsActive

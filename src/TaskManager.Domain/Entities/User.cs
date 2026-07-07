@@ -18,6 +18,8 @@ public class User : AggregateRoot
 
     public DateTime LastSession { get; private set; }
 
+    public ICollection<UserRoles> UserRoles { get; private set; } = new List<UserRoles>();
+
     //private readonly List<Role> _roles = [];
 
     //public IReadOnlyCollection<Role> Roles => _roles;
@@ -78,9 +80,21 @@ public class User : AggregateRoot
         PassHash = newPassHash;
     }
 
-    public void AssignRole(Role role)
+    public void AssignRole(Guid roleId)
     {
-        
+        bool alreadyAssigned = UserRoles.Any(ur => ur.RoleId == roleId);
+
+        if (alreadyAssigned)
+        {
+            throw new InvalidOperationException("Role is already assigned to the user.");
+        }
+
+        UserRoles.Add(
+            new UserRoles(
+                Id,
+                roleId
+            )
+        );
     }
 
     public void RemoveRole(Role role)
