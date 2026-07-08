@@ -1,0 +1,35 @@
+flowchart LR
+
+subgraph Developers
+
+AO[Developer AO]
+MR[Developer MR]
+LM[Developer LM]
+
+end
+
+subgraph GitHub
+
+A[main]
+
+B[dev]
+
+C[dev-ao]
+
+D[dev-mr]
+
+E[dev-lm]
+
+end
+
+AO --> C
+MR --> D
+LM --> E
+
+C -->|"PR #25"| B
+D -->|"PR #26"| B
+E -->|"PR #27"| B
+
+B -->|"Release PR Version 0.1.x"| A
+
+A -->|"CI/CD"| Deploy[Render]
