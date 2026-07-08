@@ -11,6 +11,7 @@ namespace TaskManager.Api.Controllers;
 
 [ApiController]
 [Route("api/tasks")]
+[Tags("Tasks")]
 public class TaskController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -20,38 +21,24 @@ public class TaskController : ControllerBase
         _taskService = taskService;
     }
 
-    /*
-     * POST: api/tasks
-     * Creates a new task with the provided details.
-     * Returns a 201 Created response with the created task's details if successful, or a 400 Bad Request response if the request is invalid.
-     *
-     * Body:
-     * {
-     *     "title": "string",
-     *     "description": "string",
-     *     "dueDate": "2024-06-01T00:00:00Z",
-     *     "status": "string", ["Draft", "Pending", "InProgress", "Completed", "Cancelled"]
-     *     "priority": "string" ["Low", "Medium", "High"]
-     * }
-     *
-     * Example CURL request:
-     * curl -X POST "https://localhost:5001/api/tasks" -H "Content-Type: application/json" -d "{\"title\":\"Task 1\",\"description\":\"Description 1\",\"dueDate\":\"2024-06-01T00:00:00Z\",\"status\":\"InProgress\",\"priority\":\"High\"}"
-     *
-     * Example response:
-     * {
-     *     "action": "post",
-     *     "httpStatusCode": 201,
-     *     "message": "Task created successfully.",
-     *     "data": {
-     *         "id": "guid",
-     *         "title": "Task 1",
-     *         "description": "Description 1",
-     *         "dueDate": "2024-06-01T00:00:00Z",
-     *         "status": "InProgress",
-     *         "priority": "High"
-     *     }
-     * }
-     */
+    /// <summary>
+    /// Creates a new task.
+    /// </summary>
+    /// <remarks>
+    /// Valid values for <c>status</c>: <c>Draft</c>, <c>Pending</c>, <c>InProgress</c>, <c>Completed</c>, <c>Cancelled</c>.<br/>
+    /// Valid values for <c>priority</c>: <c>Low</c>, <c>Medium</c>, <c>High</c>.
+    /// <para>
+    /// Example request body:
+    /// <code>
+    /// { "title": "New Task", "description": "Task description", "status": "Draft", "priority": "Medium", "dueAt": "2024-06-01T00:00:00Z" }
+    /// </code>
+    /// </para>
+    /// </remarks>
+    /// <param name="request">Task data: <c>title</c>, <c>description</c>, <c>status</c>, <c>priority</c>, and <c>dueAt</c>.</param>
+    /// <returns>The newly created task wrapped in an API response.</returns>
+    /// <response code="201">Returns the created task.</response>
+    /// <response code="400">Invalid request data.</response>
+    /// 
      //TODO: The dueDate field is not being saving correctly in the database, it is being saved as bad date. Need to investigate and fix this issue.
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<TaskResponse>), (int)HttpStatusCode.Created)]
@@ -92,47 +79,12 @@ public class TaskController : ControllerBase
         );
     }
 
-    /*
-     * GET: api/tasks
-     * Retrieves all tasks in the system.
-     * Returns a 200 OK response with a list of tasks if found, or a 404 Not Found response if no tasks exist.
-     *
-     * Example CURL request:
-     * curl -X GET "https://localhost:5001/api/tasks"
-     *
-     * Example response (200 OK):
-     * {
-     *     "action": "get",
-     *     "httpStatusCode": 200,
-     *     "message": "Tasks retrieved successfully.",
-     *     "data": [
-     *         {
-     *             "id": "guid",
-     *             "title": "Task 1",
-     *             "description": "Description 1",
-     *             "dueDate": "2024-06-01T00:00:00Z",
-     *             "status": "InProgress",
-     *             "priority": "High"
-     *         },
-     *         {
-     *             "id": "guid",
-     *             "title": "Task 2",
-     *             "description": "Description 2",
-     *             "dueDate": "2024-06-02T00:00:00Z",
-     *             "status": "Pending",
-     *             "priority": "Medium"
-     *         }
-     *     ]
-     * }
-     *
-     * Example response (404 Not Found):
-     * {
-     *     "action": "get",
-     *     "httpStatusCode": 404,
-     *     "message": "No tasks found.",
-     *     "data": "No tasks available in the system."
-     * }
-    */
+    /// <summary>
+    /// Retrieves all active tasks.
+    /// </summary>
+    /// <returns>A list of tasks wrapped in an API response.</returns>
+    /// <response code="200">Returns the list of tasks.</response>
+    /// <response code="404">No tasks found.</response>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -160,37 +112,13 @@ public class TaskController : ControllerBase
         return Ok(response);
     }
 
-    /*
-    * GET: api/tasks/{id}
-    * Retrieves a task by its unique identifier.
-    * Returns a 200 OK response with the task's details if found, or a 404 Not Found response if the task does not exist.
-    *
-    * Example CURL request:
-    * curl -X GET "https://localhost:5001/api/tasks/{id}"
-    *
-    * Example response (200 OK):
-    * {
-    *     "action": "get",
-    *     "httpStatusCode": 200,
-    *     "message": "Task retrieved successfully.",
-    *     "data": {
-    *         "id": "guid",
-    *         "title": "Task 1",
-    *         "description": "Description 1",
-    *         "dueDate": "2024-06-01T00:00:00Z",
-    *         "status": "InProgress",
-    *         "priority": "High"
-    *     }
-    * }
-    *
-    * Example response (404 Not Found):
-    * {
-    *     "action": "get",
-    *     "httpStatusCode": 404,
-    *     "message": "Task not found.",
-    *     "data": "No task found with ID: {id}"
-    * }
-    */
+    /// <summary>
+    /// Retrieves a task by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the task.</param>
+    /// <returns>The task details wrapped in an API response.</returns>
+    /// <response code="200">Returns the task details.</response>
+    /// <response code="404">Task not found.</response>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<TaskResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.NotFound)]
@@ -219,47 +147,25 @@ public class TaskController : ControllerBase
         return Ok(response);
     }
 
-    /*
-    * PUT: api/tasks/{id}
-    * Updates an existing task with the provided details.
-    * Returns a 200 OK response with a success message if the update is successful, a 404 Not Found response if the task does not exist, or a 400 Bad Request response if the request is invalid.
-    *
-    * Example request body:
-    * {
-    *     "title": "Updated Task",
-    *     "description": "Updated Description",
-    *     "status": "InProgress", ["Draft", "Pending", "InProgress", "Completed", "Cancelled"]
-    *     "priority": "High" ["Low", "Medium", "High"]
-    *     "dueAt": "2024-06-01T00:00:00Z"
-    * }
-    *
-    * Example CURL request:
-    * curl -X PUT "https://localhost:5001/api/tasks/{id}" -H "Content-Type: application/json" -d '{"title":"Updated Task","description":"Updated Description","status":"InProgress","priority":"High","dueAt":"2024-06-01T00:00:00Z"}'
-    *
-    * Example response (200 OK):
-    * {
-    *     "action": "put",
-    *     "httpStatusCode": 200,
-    *     "message": "Task updated successfully.",
-    *     "data": "Task with ID: {id} updated successfully."
-    * }
-    *
-    * Example response (404 Not Found):
-    * {
-    *     "action": "put",
-    *     "httpStatusCode": 404,
-    *     "message": "Task not found.",
-    *     "data": "No task found with ID: {id}"
-    * }
-    *
-    * Example response (400 Bad Request):
-    * {
-    *     "action": "put",
-    *     "httpStatusCode": 400,
-    *     "message": "Invalid request data.",
-    *     "data": "Error details..."
-    * }
-    */
+    /// <summary>
+    /// Updates an existing task by its ID.
+    /// </summary>
+    /// <remarks>
+    /// Valid values for <c>status</c>: <c>Draft</c>, <c>Pending</c>, <c>InProgress</c>, <c>Completed</c>, <c>Cancelled</c>.<br/>
+    /// Valid values for <c>priority</c>: <c>Low</c>, <c>Medium</c>, <c>High</c>.
+    /// <para>
+    /// Example request body:
+    /// <code>
+    /// { "title": "Updated Task", "description": "Updated", "status": "InProgress", "priority": "High", "dueAt": "2024-06-01T00:00:00Z" }
+    /// </code>
+    /// </para>
+    /// </remarks>
+    /// <param name="id">The unique identifier of the task to update.</param>
+    /// <param name="request">Updated task data.</param>
+    /// <returns>A success, not-found or bad-request message wrapped in an API response.</returns>
+    /// <response code="200">Task updated successfully.</response>
+    /// <response code="404">Task not found.</response>
+    /// <response code="400">Invalid request data.</response>
     //TODO: The dueDate field is not being saving correctly in the database, it is being saved as bad date. Need to investigate and fix this issue.
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.NotFound)]
@@ -310,22 +216,13 @@ public class TaskController : ControllerBase
     }
 
 
-    /*
-    * DELETE: api/tasks/{id}
-    * Deletes a task by its unique identifier.
-    * Returns a 200 OK response with a success message if the deletion is successful, or a 404 Not Found response if the task does not exist.
-    * 
-    * Example CURL request:
-    * curl -X DELETE "https://localhost:5001/api/tasks/{id}"
-    * 
-    * Example response (200 OK):
-    * {
-    *     "action": "delete",
-    *     "httpStatusCode": 200,
-    *     "message": "Task deleted successfully.",
-    *     "data": "Task with ID: {id} deleted successfully."
-    * }
-    */
+    /// <summary>
+    /// Soft-deletes a task by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the task to delete.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">Task deleted successfully.</response>
+    /// <response code="404">Task not found.</response>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(ApiResponse<string>), (int)HttpStatusCode.OK)]

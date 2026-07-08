@@ -10,6 +10,7 @@ namespace TaskManager.Api.Controllers;
 [ApiController]
 //[Route("api/[controller]")]
 [Route("api/users")]
+[Tags("Users")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -19,35 +20,23 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    /* 
-        POST /api/users
-        Creates a new user with the provided details.
-        Returns a 201 Created response with the created user's details if successful, or a 400 Bad Request response if the request is invalid.
-
-        Body:
-        {
-            "username": "string",
-            "fullName": "string",
-            "email": "string",
-            "password": "string"
-        }
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/users" -H "Content-Type: application/json" -d "{\"username\":\"johndoe\",\"fullName\":\"John Doe\",\"email\":\"johndoe@example.com\",\"password\":\"password123\"}"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 201,
-            "message": "User created successfully.",
-            "data": {
-                "id": "guid",
-                "username": "johndoe",
-                "fullName": "John Doe",
-                "email": "johndoe@example.com"
-            }
-        }
-    */
+    /// <summary>
+    /// Creates a new user.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// {
+    ///     "username": "johndoe",
+    ///     "fullName": "John Doe",
+    ///     "email": "johndoe@example.com",
+    ///     "password": "password123"
+    /// }
+    /// </code>
+    /// </remarks>
+    /// <param name="request">User data: <c>username</c>, <c>fullName</c>, <c>email</c> and <c>password</c>.</param>
+    /// <returns>The newly created user wrapped in an API response.</returns>
+    /// <response code="201">Returns the created user.</response>
 
     //TODO: Check how to handle the password in the request.
     [HttpPost]
@@ -70,29 +59,12 @@ public class UserController : ControllerBase
         );
     }
 
-    /*
-        GET /api/users
-        Retrieves a list of all users.
-        Returns a 200 OK response with the list of users if successful, or a 404 Not Found response if no users are found.
-
-        Example CURL request:
-        curl -X GET "https://localhost:5001/api/users"
-
-        Example response:
-        {
-            "action": "get",
-            "httpStatusCode": 200,
-            "message": "Users retrieved successfully.",
-            "data": [
-                {
-                    "id": "guid",
-                    "username": "johndoe",
-                    "fullName": "John Doe",
-                    "email": "johndoe@example.com"
-                }
-            ]
-        }
-    */
+    /// <summary>
+    /// Retrieves a list of all active users.
+    /// </summary>
+    /// <returns>A list of users wrapped in an API response.</returns>
+    /// <response code="200">Returns the list of users.</response>
+    /// <response code="404">No users found.</response>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -120,40 +92,14 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
-    /*
-        GET /api/users/{id}
-        Retrieves a user by their unique identifier.
-        Returns a 200 OK response with the user's details if found, or a 404 Not Found response if the user does not exist.
-
-        Path parameter:
-        - id: The unique identifier of the user (GUID).
-
-        Query parameter:
-        - showRoles (optional): A boolean flag indicating whether to include the user's roles in the response. Default is false.
-
-        Example CURL request:
-        curl -X GET "https://localhost:5001/api/users/{id}?showRoles=true"
-
-        Example response:
-        {
-            "action": "get",
-            "httpStatusCode": 200,
-            "message": "User retrieved successfully.",
-            "data": {
-                "id": "guid",
-                "username": "johndoe",
-                "fullName": "John Doe",
-                "email": "johndoe@example.com",
-                "roles": [
-                    {
-                        "id": "guid",
-                        "name": "Admin",
-                        "description": "Administrator role"
-                    }
-                ]
-            }
-        }
-    */
+    /// <summary>
+    /// Retrieves a user by their unique identifier, optionally including their assigned roles.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <param name="showRoles">When <c>true</c>, includes the roles assigned to the user.</param>
+    /// <returns>The user details wrapped in an API response.</returns>
+    /// <response code="200">Returns the user details.</response>
+    /// <response code="404">User not found.</response>
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, [FromQuery] bool showRoles = false)
     {
@@ -226,21 +172,20 @@ public class UserController : ControllerBase
 
 
 
-    /*
-        PUT /api/users/{id}
-        Updates an existing user's details.
-        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
-
-        Body:
-        {
-            "username": "string",
-            "fullName": "string",
-            "email": "string"
-        }
-
-        Example CURL request:
-        curl -X PUT "https://localhost:5001/api/users/{id}" -H "Content-Type: application/json" -d "{\"username\":\"johndoe\",\"fullName\":\"John Doe\",\"email\":\"
-    */
+    /// <summary>
+    /// Updates an existing user's basic details.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// { "username": "johndoe", "fullName": "John Doe", "email": "johndoe@example.com" }
+    /// </code>
+    /// </remarks>
+    /// <param name="id">The unique identifier of the user to update.</param>
+    /// <param name="request">Updated user data: <c>username</c>, <c>fullName</c> and <c>email</c>.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">User updated successfully.</response>
+    /// <response code="404">User not found.</response>
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
@@ -292,28 +237,20 @@ public class UserController : ControllerBase
     } */
 
 
-    /*
-        PUT /api/users/{id}/avatar
-        Updates an existing user's avatar and avatar background.
-        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
-
-        Body:
-        {
-            "avatar": "string",
-            "avatarBg": "string"
-        }
-
-        Example CURL request:
-        curl -X PUT "https://localhost:5001/api/users/{id}/avatar" -H "Content-Type: application/json" -d "{\"avatar\":\"avatar_url\",\"avatarBg\":\"background_url\"}"
-
-        Example response:
-        {
-            "action": "put",
-            "httpStatusCode": 200,
-            "message": "User avatar updated successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Updates a user's avatar and avatar background color.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// { "avatar": "avatar_url", "avatarBg": "#FFFFFF" }
+    /// </code>
+    /// </remarks>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <param name="request">Avatar data: <c>avatar</c> URL and <c>avatarBg</c> background value.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">User avatar updated successfully.</response>
+    /// <response code="404">User not found.</response>
     [HttpPut("{id:guid}/avatar")]
     public async Task<IActionResult> UpdateAvatar(Guid id, [FromBody] UpdateUserAvatarRequest request)
     {
@@ -339,27 +276,20 @@ public class UserController : ControllerBase
         });
     }
 
-    /*
-        PUT /api/users/{id}/password
-        Updates an existing user's password.
-        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the user does not exist.
-
-        Body:
-        {
-            "password": "string"
-        }
-
-        Example CURL request:
-        curl -X PUT "https://localhost:5001/api/users/{id}/password" -H "Content-Type: application/json" -d "{\"password\":\"new_password\"}"
-
-        Example response:
-        {
-            "action": "put",
-            "httpStatusCode": 200,
-            "message": "User password updated successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Updates a user's password.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// { "password": "new_secure_password" }
+    /// </code>
+    /// </remarks>
+    /// <param name="id">The unique identifier of the user.</param>
+    /// <param name="request">Password data containing the new <c>password</c>.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">Password updated successfully.</response>
+    /// <response code="404">User not found.</response>
     //TODO: Check the security implications of allowing password updates through an API endpoint. Consider implementing additional security measures such as authentication and authorization checks, rate limiting, and logging of password change attempts.
     [HttpPut("{id:guid}/password")]
     public async Task<IActionResult> UpdatePassword(Guid id, [FromBody] UpdateUserPasswordRequest request)
@@ -386,22 +316,13 @@ public class UserController : ControllerBase
         });
     }
 
-    /*
-        DELETE /api/users/{id}
-        Deletes an existing user.
-        Returns a 200 OK response if the deletion is successful, or a 404 Not Found response if the user does not exist.
-
-        Example CURL request:
-        curl -X DELETE "https://localhost:5001/api/users/{id}"
-
-        Example response:
-        {
-            "action": "delete",
-            "httpStatusCode": 200,
-            "message": "User deleted successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Soft-deletes a user by their ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to delete.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">User deleted successfully.</response>
+    /// <response code="404">User not found.</response>
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -427,22 +348,13 @@ public class UserController : ControllerBase
         });
     }
 
-    /*
-        POST /api/users/{userId}/roles/{roleId}
-        Assigns a role to an existing user.
-        Returns a 200 OK response if the assignment is successful, or a 404 Not Found response if the user or role does not exist.
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/users/{userId}/roles/{roleId}"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 200,
-            "message": "Role assigned successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Assigns a single role to a user.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user.</param>
+    /// <param name="roleId">The unique identifier of the role to assign.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Role assigned successfully.</response>
     [HttpPost("{userId:guid}/roles/{roleId:guid}")]
     public async Task<IActionResult> AssignRole(Guid userId, Guid roleId)
     {
@@ -480,29 +392,19 @@ public class UserController : ControllerBase
         });
     }
 
-    /*
-        POST /api/users/{userId}/roles
-        Assigns multiple roles to an existing user.
-        Returns a 200 OK response if the assignment is successful, or a 404 Not Found response if the user or any of the roles do not exist.
-
-        Body:
-        [
-            "roleId1",
-            "roleId2",
-            "roleId3"
-        ]
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/users/{userId}/roles" -H "Content-Type: application/json" -d "[\"roleId1\",\"roleId2\",\"roleId3\"]"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 200,
-            "message": "Roles assigned successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Assigns multiple roles to a user in a single operation.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// [ "roleId1", "roleId2", "roleId3" ]
+    /// </code>
+    /// </remarks>
+    /// <param name="userId">The unique identifier of the user.</param>
+    /// <param name="roleIds">A list of role IDs to assign to the user.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Roles assigned successfully.</response>
     [HttpPost("{userId:guid}/roles")]
     public async Task<IActionResult> AssignManyRoles(Guid userId, [FromBody] List<Guid> roleIds)
     {
