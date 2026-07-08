@@ -10,6 +10,8 @@ public interface IPermissionService
 
     Task<PermissionDto?> GetByIdAsync(Guid id);
 
+    Task<PermissionWithRoleDto?> GetOneWithRolesAsync(Guid permissionId);
+
     Task<bool> UpdateAsync(Guid id, string name, string description);
 
     Task<bool> DeleteAsync(Guid id);

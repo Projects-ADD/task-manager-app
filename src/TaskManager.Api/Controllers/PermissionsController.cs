@@ -131,8 +131,14 @@ public class PermissionsController : ControllerBase
         Retrieves a permission by its ID.
         Returns a 200 OK response with the permission details if found, or a 404 Not Found response if not found.
 
+        Path parameter:
+        - id: The ID of the permission to retrieve.
+
+        Query parameter:
+        - showRoles (optional): A boolean indicating whether to include the roles associated with the permission. Default is false.
+
         Example CURL request:
-        curl -X GET "https://localhost:5001/api/permissions/{id}"
+        curl -X GET "https://localhost:5001/api/permissions/{id}?showRoles=true"
         
         Example response (if found):
         {
@@ -157,8 +163,46 @@ public class PermissionsController : ControllerBase
         }
     */
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<PermissionResponse>>> GetById(Guid id)
+    public async Task<ActionResult<ApiResponse<PermissionResponse>>> GetById(Guid id, [FromQuery] bool showRoles = false)
     {
+        if (showRoles)
+        {
+            var permissionWithRoles = await _permissionService.GetOneWithRolesAsync(id);
+
+            if (permissionWithRoles is null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Action = "get",
+                    HttpStatusCode = (int)HttpStatusCode.NotFound,
+                    Message = "Permission not found.",
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<PermissionWithRolesResponse>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.OK,
+                Message = "Permission with roles retrieved successfully.",
+                Data = new PermissionWithRolesResponse
+                {
+                    Id = permissionWithRoles.Id,
+                    Name = permissionWithRoles.Name,
+                    Description = permissionWithRoles.Description,
+                    CreatedAt = permissionWithRoles.CreatedAt,
+                    IsActive = permissionWithRoles.IsActive,
+                    Roles = permissionWithRoles.Roles.Select(r => new RoleResponse
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Description = r.Description,
+                        CreatedAt = r.CreatedAt,
+                        IsActive = r.IsActive
+                    }).ToList()
+                }
+            });
+        }
         var permission = await _permissionService.GetByIdAsync(id);
 
         if (permission is null)

@@ -373,7 +373,7 @@ public class RolesController : ControllerBase
             "data": null
         }
     */
-    [HttpPost("{roleId}/permissions/{permissionId}")]
+    [HttpPost("{roleId:guid}/permissions/{permissionId:guid}")]
     public async Task<IActionResult> AssignPermission(Guid roleId, Guid permissionId)
     {
         await _roleService.AssignPermissionAsync(roleId, permissionId);
@@ -413,7 +413,7 @@ public class RolesController : ControllerBase
             "data": null
         }
     */
-    [HttpPost("{roleId}/permissions")]
+    [HttpPost("{roleId:guid}/permissions")]
     public async Task<IActionResult> AssignManyPermissions(Guid roleId, [FromBody] List<Guid> permissionIds)
     {
         await _roleService.AssignManyPermissionsAsync(roleId, permissionIds);
@@ -423,6 +423,46 @@ public class RolesController : ControllerBase
             Action = "post",
             HttpStatusCode = (int)HttpStatusCode.OK,
             Message = $"Permissions assigned to role {roleId} successfully.",
+            Data = null
+        });
+    }
+
+    /*
+        POST: api/roles/{roleId}/users
+        Assigns multiple users to a role.
+        Returns a 200 OK response if the assignment is successful.
+
+        Path Parameters:
+        - roleId: The unique identifier of the role.
+
+        Body:
+        [
+            "user-id-1",
+            "user-id-2",
+            "user-id-3"
+        ]
+
+        Example CURL request:
+        curl -X POST "https://localhost:5001/api/roles/{roleId}/users" -H "Content-Type: application/json" -d "[\"user-id-1\",\"user-id-2\"]"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 200,
+            "message": "Users assigned to role {roleId} successfully.",
+            "data": null
+        }
+    */
+    [HttpPost("{roleId:guid}/users")]
+    public async Task<IActionResult> AssignManyUsers(Guid roleId, [FromBody] List<Guid> userIds)
+    {
+        await _roleService.AssignManyUsersAsync(roleId, userIds);
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = $"Users assigned to role {roleId} successfully.",
             Data = null
         });
     }

@@ -125,8 +125,14 @@ public class UserController : ControllerBase
         Retrieves a user by their unique identifier.
         Returns a 200 OK response with the user's details if found, or a 404 Not Found response if the user does not exist.
 
+        Path parameter:
+        - id: The unique identifier of the user (GUID).
+
+        Query parameter:
+        - showRoles (optional): A boolean flag indicating whether to include the user's roles in the response. Default is false.
+
         Example CURL request:
-        curl -X GET "https://localhost:5001/api/users/{id}"
+        curl -X GET "https://localhost:5001/api/users/{id}?showRoles=true"
 
         Example response:
         {
@@ -137,13 +143,63 @@ public class UserController : ControllerBase
                 "id": "guid",
                 "username": "johndoe",
                 "fullName": "John Doe",
-                "email": "johndoe@example.com"
+                "email": "johndoe@example.com",
+                "roles": [
+                    {
+                        "id": "guid",
+                        "name": "Admin",
+                        "description": "Administrator role"
+                    }
+                ]
             }
         }
     */
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, [FromQuery] bool showRoles = false)
     {
+        if (showRoles)
+        {
+            var userWithRoles = await _userService.GetOneWithRolesAsync(id);
+
+            if (userWithRoles is null)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Action = "get",
+                    HttpStatusCode = (int)HttpStatusCode.NotFound,
+                    Message = "User not found.",
+                    Data = null
+                });
+            }
+
+            var responseWithRoles = new ApiResponse<UserWithRolesResponse>
+            {
+                Action = "get",
+                HttpStatusCode = (int)HttpStatusCode.OK,
+                Message = "User with roles retrieved successfully.",
+                Data = new UserWithRolesResponse
+                {
+                    Id = userWithRoles.Id,
+                    Username = userWithRoles.Username,
+                    FullName = userWithRoles.FullName,
+                    Email = userWithRoles.Email,
+                    Avatar = userWithRoles.Avatar,
+                    AvatarBg = userWithRoles.AvatarBg,
+                    LastSession = userWithRoles.LastSession,
+                    CreatedAt = userWithRoles.CreatedAt,
+                    IsActive = userWithRoles.IsActive,
+                    Roles = userWithRoles.Roles.Select(r => new RoleResponse
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Description = r.Description
+                    }).ToList()
+                }
+            };
+
+            return Ok(responseWithRoles);
+        }
+
         var user = await _userService.GetByIdAsync(id);
 
         if (user == null)
@@ -167,6 +223,8 @@ public class UserController : ControllerBase
 
         return Ok(response);
     }
+
+
 
     /*
         PUT /api/users/{id}
@@ -365,6 +423,96 @@ public class UserController : ControllerBase
             Action = "delete",
             HttpStatusCode = (int)HttpStatusCode.OK,
             Message = "User deleted successfully.",
+            Data = null
+        });
+    }
+
+    /*
+        POST /api/users/{userId}/roles/{roleId}
+        Assigns a role to an existing user.
+        Returns a 200 OK response if the assignment is successful, or a 404 Not Found response if the user or role does not exist.
+
+        Example CURL request:
+        curl -X POST "https://localhost:5001/api/users/{userId}/roles/{roleId}"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 200,
+            "message": "Role assigned successfully.",
+            "data": null
+        }
+    */
+    [HttpPost("{userId:guid}/roles/{roleId:guid}")]
+    public async Task<IActionResult> AssignRole(Guid userId, Guid roleId)
+    {
+        //TODO: test the responses
+        /* try
+        {
+            await _userService.AssignRoleAsync(userId, roleId);
+            return Ok(new ApiResponse<object>
+            {
+                Action = "post",
+                HttpStatusCode = (int)HttpStatusCode.OK,
+                Message = "Role assigned successfully.",
+                Data = null
+            });
+        }//TODO: In this case, it can be a custom response with a specific error code for role not found, instead of using the generic NotFoundException.
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ApiResponse<object>
+            {
+                Action = "post",
+                HttpStatusCode = (int)HttpStatusCode.NotFound,
+                Message = ex.Message,
+                Data = null
+            });
+        } */
+
+        await _userService.AssignRoleAsync(userId, roleId);
+        
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Role assigned successfully.",
+            Data = null
+        });
+    }
+
+    /*
+        POST /api/users/{userId}/roles
+        Assigns multiple roles to an existing user.
+        Returns a 200 OK response if the assignment is successful, or a 404 Not Found response if the user or any of the roles do not exist.
+
+        Body:
+        [
+            "roleId1",
+            "roleId2",
+            "roleId3"
+        ]
+
+        Example CURL request:
+        curl -X POST "https://localhost:5001/api/users/{userId}/roles" -H "Content-Type: application/json" -d "[\"roleId1\",\"roleId2\",\"roleId3\"]"
+
+        Example response:
+        {
+            "action": "post",
+            "httpStatusCode": 200,
+            "message": "Roles assigned successfully.",
+            "data": null
+        }
+    */
+    [HttpPost("{userId:guid}/roles")]
+    public async Task<IActionResult> AssignManyRoles(Guid userId, [FromBody] List<Guid> roleIds)
+    {
+        await _userService.AssignManyRolesAsync(userId, roleIds);
+
+        return Ok(new ApiResponse<object>
+        {
+            Action = "post",
+            HttpStatusCode = (int)HttpStatusCode.OK,
+            Message = "Roles assigned successfully.",
             Data = null
         });
     }
