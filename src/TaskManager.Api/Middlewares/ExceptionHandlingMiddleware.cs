@@ -36,8 +36,12 @@ public class ExceptionHandlingMiddleware
             var jsonResponse = JsonSerializer.Serialize(response);
             await context.Response.WriteAsync(jsonResponse);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine("Un errorzazo!!!!!! ******** (x_X) ********");
+            Console.WriteLine($"Unhandled exception: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
