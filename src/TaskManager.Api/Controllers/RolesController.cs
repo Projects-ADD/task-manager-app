@@ -10,7 +10,7 @@ namespace TaskManager.Api.Controllers;
 
 [ApiController]
 [Route("api/roles")]
-
+[Tags("Roles")]
 public class RolesController : ControllerBase
 {
     private readonly IRoleService _roleService;
@@ -21,34 +21,18 @@ public class RolesController : ControllerBase
     }
 
 
-    /*
-        POST: api/roles
-        Creates a new role with the specified name and description.
-        Returns a 201 Created response with the created role's details.
-
-        Body:
-        {
-            "name": "Role Name",
-            "description": "Role Description"
-        }
-
-        Example CURL request :
-        curl -X POST "https://localhost:5001/api/roles" -H "Content-Type: application/json" -d "{\"name\":\"Admin\",\"description\":\"Administrator role\"}"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 201,
-            "message": "Role created successfully.",
-            "data": {
-                "id": "role-id",
-                "name": "Admin",
-                "description": "Administrator role",
-                "createdAt": "2023-10-01T12:34:56Z",
-                "isActive": true
-            }
-        }
-    */
+    /// <summary>
+    /// Creates a new role.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// { "name": "Admin", "description": "Administrator role" }
+    /// </code>
+    /// </remarks>
+    /// <param name="request">Role data: <c>name</c> and <c>description</c>.</param>
+    /// <returns>The newly created role wrapped in an API response.</returns>
+    /// <response code="201">Returns the created role.</response>
     [HttpPost]
     public async Task<ActionResult<RoleResponse>> Create([FromBody] CreateRoleRequest request)
     {
@@ -70,42 +54,13 @@ public class RolesController : ControllerBase
 
     }
 
-    /*
-        GET: api/roles
-        Retrieves all roles, optionally including their associated permissions.
-        Returns a 200 OK response with the list of roles.
-
-        Query Parameters:
-        - includePermissions (optional): If true, includes permissions for each role.
-
-        Example CURL request:
-        curl -X GET "https://localhost:5001/api/roles?includePermissions=true"
-
-        Example response:
-        {
-            "action": "get",
-            "httpStatusCode": 200,
-            "message": "Roles retrieved successfully.",
-            "data": [
-                {
-                    "id": "role-id",
-                    "name": "Admin",
-                    "description": "Administrator role",
-                    "createdAt": "2023-10-01T12:34:56Z",
-                    "isActive": true,
-                    "permissions": [
-                        {
-                            "id": "permission-id",
-                            "name": "Permission Name",
-                            "description": "Permission Description",
-                            "createdAt": "2023-10-01T12:34:56Z",
-                            "isActive": true
-                        }
-                    ]
-                }
-            ]
-        }
-    */
+    /// <summary>
+    /// Retrieves all active roles, optionally including their associated permissions.
+    /// </summary>
+    /// <param name="includePermissions">When <c>true</c>, includes the permissions assigned to each role.</param>
+    /// <returns>A list of roles wrapped in an API response.</returns>
+    /// <response code="200">Returns the list of roles.</response>
+    /// <response code="404">No roles found.</response>
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] bool includePermissions = false)
     {
@@ -156,43 +111,14 @@ public class RolesController : ControllerBase
     }
 
 
-    /*
-        GET: api/roles/{id}
-        Retrieves a role by its ID, optionally including its associated permissions.
-        Returns a 200 OK response with the role's details.
-
-        Path Parameters:
-        - id: The unique identifier of the role.
-
-        Query Parameters:
-        - includePermissions (optional): If true, includes permissions for the role.
-
-        Example CURL request:
-        curl -X GET "https://localhost:5001/api/roles/{id}?includePermissions=true"
-
-        Example response:
-        {
-            "action": "get",
-            "httpStatusCode": 200,
-            "message": "Role retrieved successfully.",
-            "data": {
-                "id": "role-id",
-                "name": "Admin",
-                "description": "Administrator role",
-                "createdAt": "2023-10-01T12:34:56Z",
-                "isActive": true,
-                "permissions": [
-                    {
-                        "id": "permission-id",
-                        "name": "Permission Name",
-                        "description": "Permission Description",
-                        "createdAt": "2023-10-01T12:34:56Z",
-                        "isActive": true
-                    }
-                ]
-            }
-        }
-    */
+    /// <summary>
+    /// Retrieves a role by its unique identifier, optionally including its associated permissions.
+    /// </summary>
+    /// <param name="id">The unique identifier of the role.</param>
+    /// <param name="includePermissions">When <c>true</c>, includes the permissions assigned to the role.</param>
+    /// <returns>The role details wrapped in an API response.</returns>
+    /// <response code="200">Returns the role details.</response>
+    /// <response code="404">Role not found.</response>
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includePermissions = false)
     {
@@ -242,39 +168,20 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        PUT: api/roles/{id}
-        Updates an existing role with the specified name and description.
-        Returns a 200 OK response if the update is successful, or a 404 Not Found response if the role does not exist.
-
-        Path Parameters:
-        - id: The unique identifier of the role to update.
-
-        Body:
-        {
-            "name": "Updated Role Name",
-            "description": "Updated Role Description"
-        }
-
-        Example CURL request:
-        curl -X PUT "https://localhost:5001/api/roles/{id}" -H "Content-Type: application/json" -d "{\"name\":\"Updated Admin\",\"description\":\"Updated Administrator role\"}"
-
-        Example response (success):
-        {
-            "action": "put",
-            "httpStatusCode": 200,
-            "message": "Role updated successfully.",
-            "data": null
-        }
-
-        Example response (not found):
-        {
-            "action": "put",
-            "httpStatusCode": 404,
-            "message": "Role not found.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Updates an existing role by its ID.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// { "name": "Updated Admin", "description": "Updated Administrator role" }
+    /// </code>
+    /// </remarks>
+    /// <param name="id">The unique identifier of the role to update.</param>
+    /// <param name="request">Updated role data: <c>name</c> and <c>description</c>.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">Role updated successfully.</response>
+    /// <response code="404">Role not found.</response>
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update( Guid id, [FromBody] UpdateRoleRequest request)
     {
@@ -300,33 +207,13 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        DELETE: api/roles/{id}
-        Deletes an existing role by its ID.
-        Returns a 200 OK response if the deletion is successful, or a 404 Not Found response if the role does not exist.
-
-        Path Parameters:
-        - id: The unique identifier of the role to delete.
-
-        Example CURL request:
-        curl -X DELETE "https://localhost:5001/api/roles/{id}"
-
-        Example response (success):
-        {
-            "action": "delete",
-            "httpStatusCode": 200,
-            "message": "Role deleted successfully.",
-            "data": null
-        }
-
-        Example response (not found):
-        {
-            "action": "delete",
-            "httpStatusCode": 404,
-            "message": "Role not found.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Soft-deletes a role by its ID.
+    /// </summary>
+    /// <param name="id">The unique identifier of the role to delete.</param>
+    /// <returns>A success or not-found message wrapped in an API response.</returns>
+    /// <response code="200">Role deleted successfully.</response>
+    /// <response code="404">Role not found.</response>
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -353,26 +240,13 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        POST: api/roles/{roleId}/permissions/{permissionId}
-        Assigns a permission to a role.
-        Returns a 200 OK response if the assignment is successful.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-        - permissionId: The unique identifier of the permission to assign.
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/roles/{roleId}/permissions/{permissionId}"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 200,
-            "message": "Permission {permissionId} assigned to role {roleId} successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Assigns a single permission to a role.
+    /// </summary>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <param name="permissionId">The unique identifier of the permission to assign.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Permission assigned successfully.</response>
     [HttpPost("{roleId:guid}/permissions/{permissionId:guid}")]
     public async Task<IActionResult> AssignPermission(Guid roleId, Guid permissionId)
     {
@@ -387,32 +261,19 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        POST: api/roles/{roleId}/permissions
-        Assigns multiple permissions to a role.
-        Returns a 200 OK response if the assignment is successful.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-
-        Body:
-        [
-            "permission-id-1",
-            "permission-id-2",
-            "permission-id-3"
-        ]
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/roles/{roleId}/permissions" -H "Content-Type: application/json" -d "[\"permission-id-1\",\"permission-id-2\"]"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 200,
-            "message": "Permissions assigned to role {roleId} successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Assigns multiple permissions to a role in a single operation.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// [ "permission-id-1", "permission-id-2", "permission-id-3" ]
+    /// </code>
+    /// </remarks>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <param name="permissionIds">A list of permission IDs to assign to the role.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Permissions assigned successfully.</response>
     [HttpPost("{roleId:guid}/permissions")]
     public async Task<IActionResult> AssignManyPermissions(Guid roleId, [FromBody] List<Guid> permissionIds)
     {
@@ -427,32 +288,19 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        POST: api/roles/{roleId}/users
-        Assigns multiple users to a role.
-        Returns a 200 OK response if the assignment is successful.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-
-        Body:
-        [
-            "user-id-1",
-            "user-id-2",
-            "user-id-3"
-        ]
-
-        Example CURL request:
-        curl -X POST "https://localhost:5001/api/roles/{roleId}/users" -H "Content-Type: application/json" -d "[\"user-id-1\",\"user-id-2\"]"
-
-        Example response:
-        {
-            "action": "post",
-            "httpStatusCode": 200,
-            "message": "Users assigned to role {roleId} successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Assigns multiple users to a role in a single operation.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// [ "user-id-1", "user-id-2", "user-id-3" ]
+    /// </code>
+    /// </remarks>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <param name="userIds">A list of user IDs to assign to the role.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Users assigned successfully.</response>
     [HttpPost("{roleId:guid}/users")]
     public async Task<IActionResult> AssignManyUsers(Guid roleId, [FromBody] List<Guid> userIds)
     {
@@ -467,26 +315,13 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        DELETE: api/roles/{roleId}/permissions/{permissionId}
-        Revokes a permission from a role.
-        Returns a 200 OK response if the revocation is successful.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-        - permissionId: The unique identifier of the permission to revoke.
-
-        Example CURL request:
-        curl -X DELETE "https://localhost:5001/api/roles/{roleId}/permissions/{permissionId}"
-
-        Example response:
-        {
-            "action": "delete",
-            "httpStatusCode": 200,
-            "message": "Permission {permissionId} revoked from role {roleId} successfully.",
-            "data": null
-        }
-    */
+    /// <summary>
+    /// Revokes a single permission from a role.
+    /// </summary>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <param name="permissionId">The unique identifier of the permission to revoke.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Permission revoked successfully.</response>
     [HttpDelete("{roleId}/permissions/{permissionId}")]
     public async Task<IActionResult> RevokePermission(Guid roleId, Guid permissionId)
     {
@@ -501,35 +336,23 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        DELETE: api/roles/{roleId}/permissions
-        Revokes multiple permissions from a role.
-        Returns a 200 OK response if the revocation is successful.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-
-        Body:
-        [
-            "permission-id-1",
-            "permission-id-2",
-            "permission-id-3"
-        ]
-
-        Example CURL request:
-        curl -X DELETE "https://localhost:5001/api/roles/{roleId}/permissions" -H "Content-Type: application/json" -d "[\"permission-id-1\",\"permission-id-2\"]"
-
-        Example response:
-        {
-            "action": "delete",
-            "httpStatusCode": 200,
-            "message": "Permissions revoked from role {roleId} successfully.",
-            "data": null
-        }
-    */
-    /*
-        TODO: Cuando se revoca 1 permiso asignado y uno no asignado, el endpoint no revoca el permiso asignado y muestra error 409
-    */
+    /// <summary>
+    /// Revokes multiple permissions from a role in a single operation.
+    /// </summary>
+    /// <remarks>
+    /// Example request body:
+    /// <code>
+    /// [ "permission-id-1", "permission-id-2", "permission-id-3" ]
+    /// </code>
+    /// <para>
+    /// <strong>Known issue:</strong> When revoking a mix of assigned and unassigned permissions,
+    /// the endpoint currently returns a 409 error without processing any revocations.
+    /// </para>
+    /// </remarks>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <param name="permissionIds">A list of permission IDs to revoke from the role.</param>
+    /// <returns>A success message wrapped in an API response.</returns>
+    /// <response code="200">Permissions revoked successfully.</response>
     [HttpDelete("{roleId}/permissions")]
     public async Task<IActionResult> RevokeManyPermissions(Guid roleId, [FromBody] List<Guid> permissionIds)
     {
@@ -544,40 +367,12 @@ public class RolesController : ControllerBase
         });
     }
 
-    /*
-        GET: api/roles/{roleId}/permissions
-        Retrieves all permissions assigned to a specific role.
-        Returns a 200 OK response with the list of permissions.
-
-        Path Parameters:
-        - roleId: The unique identifier of the role.
-
-        Example CURL request:
-        curl -X GET "https://localhost:5001/api/roles/{roleId}/permissions"
-
-        Example response:
-        {
-            "action": "get",
-            "httpStatusCode": 200,
-            "message": "Permissions retrieved successfully.",
-            "data": [
-                {
-                    "id": "permission-id-1",
-                    "name": "Permission Name 1",
-                    "description": "Permission Description 1",
-                    "createdAt": "2023-10-01T12:34:56Z",
-                    "isActive": true
-                },
-                {
-                    "id": "permission-id-2",
-                    "name": "Permission Name 2",
-                    "description": "Permission Description 2",
-                    "createdAt": "2023-10-01T12:34:56Z",
-                    "isActive": true
-                }
-            ]
-        }
-    */
+    /// <summary>
+    /// Retrieves all permissions assigned to a specific role.
+    /// </summary>
+    /// <param name="roleId">The unique identifier of the role.</param>
+    /// <returns>A list of permissions assigned to the role, wrapped in an API response.</returns>
+    /// <response code="200">Returns the list of permissions assigned to the role.</response>
     [HttpGet("{roleId}/permissions")]
     public async Task<ActionResult<ApiResponse<List<PermissionResponse>>>> GetPermissionsByRole(Guid roleId)
     {
