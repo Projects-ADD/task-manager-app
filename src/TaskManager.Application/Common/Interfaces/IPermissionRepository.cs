@@ -10,6 +10,8 @@ public interface IPermissionRepository
 
     System.Threading.Tasks.Task<Permission?> GetByIdAsync(Guid id);
 
+    System.Threading.Tasks.Task<Permission?> GetOneWithRolesAsync(Guid permissionId);
+
     TaskAsync UpdateAsync(Permission permission);
 
     TaskAsync SaveChangesAsync();

@@ -56,6 +56,27 @@ public class PermissionRepository : IPermissionRepository
                 p => p.Id == id && p.DeletedAt == null);
     }
 
+    public async System.Threading.Tasks.Task<Permission?> GetOneWithRolesAsync(Guid permissionId)
+    {
+        /**
+         * Get a permission by id that is not deleted, including its associated roles.
+         * 
+         * @param permissionId The id of the permission.
+         * @return The permission with its associated roles or null if not found.
+         * 
+         * In PostgreSQL the query will be:
+         * SELECT * FROM "Permissions" p
+         * LEFT JOIN "RolePermissions" rp ON p."Id" = rp."PermissionId"
+         * LEFT JOIN "Roles" r ON rp."RoleId" = r."Id"
+         * WHERE p."Id" = {permissionId} AND p."DeletedAt" IS NULL;
+         */
+        return await _db.Permissions
+            .Include(p => p.RolePermissions)
+                .ThenInclude(rp => rp.Role)
+            .FirstOrDefaultAsync(
+                p => p.Id == permissionId && p.DeletedAt == null);
+    }
+
     public TaskAsync UpdateAsync(Permission permission)
     {
         /*

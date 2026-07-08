@@ -1,5 +1,6 @@
 using TaskManager.Application.Common.Interfaces;
 using TaskManager.Application.Features.Permissions.DTOs;
+using TaskManager.Application.Features.Roles.DTOs;
 using TaskManager.Domain.Entities;
 
 namespace TaskManager.Application.Features.Permissions;
@@ -7,10 +8,12 @@ namespace TaskManager.Application.Features.Permissions;
 public class PermissionService : IPermissionService
 {
     private readonly IPermissionRepository _permissionRepository;
+    private readonly IRoleRepository _roleRepository;
 
-    public PermissionService(IPermissionRepository permissionRepository)
+    public PermissionService(IPermissionRepository permissionRepository, IRoleRepository roleRepository)
     {
         _permissionRepository = permissionRepository;
+        _roleRepository = roleRepository;
     }
 
     public async Task<PermissionDto> CreateAsync(string name, string description)
@@ -42,6 +45,33 @@ public class PermissionService : IPermissionService
         }
 
         return MapToDto(permission);
+    }
+
+    public async Task<PermissionWithRoleDto?> GetOneWithRolesAsync(Guid permissionId)
+    {
+        var permission = await _permissionRepository.GetOneWithRolesAsync(permissionId);
+
+        if (permission is null)
+        {
+            return null;
+        }
+
+        return new PermissionWithRoleDto
+        {
+            Id = permission.Id,
+            Name = permission.Name,
+            Description = permission.Description,
+            CreatedAt = permission.CreatedAt,
+            IsActive = permission.IsActive,
+            Roles = permission.RolePermissions.Select(rp => new RoleDto
+            {
+                Id = rp.Role.Id,
+                Name = rp.Role.Name,
+                Description = rp.Role.Description,
+                CreatedAt = rp.Role.CreatedAt,
+                IsActive = rp.Role.IsActive
+            }).ToList()
+        };
     }
 
     public async Task<bool> UpdateAsync(Guid id, string name, string description)
