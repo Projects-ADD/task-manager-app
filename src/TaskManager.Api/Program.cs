@@ -34,9 +34,13 @@ builder.Services.AddSwaggerGen(options =>
 
     //include XML comments if available
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    if (File.Exists(xmlFile)) options.IncludeXmlComments(xmlFile);
+
     var xmlContracts = $"{typeof(TaskManager.Contracts.Class1).Assembly.GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlContracts));
+    if (File.Exists(xmlContracts)) options.IncludeXmlComments(xmlContracts);
+
+    //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+    //options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlContracts));
 
 });
 
